@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
 import kr.co.apiserver.domain.Todo;
+import kr.co.apiserver.repository.search.TodoSearch;
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -93,7 +94,7 @@ public class TodoRepositoryTest {
 
     @Test
     public void testSearch1(){
-        //todoRepository.search1();
+        todoRepository.search1(0L);
     }
 
 
