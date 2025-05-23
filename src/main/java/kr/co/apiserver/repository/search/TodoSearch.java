@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 
 public interface TodoSearch {
 
-    Page<Todo> search1();
+    Page<Todo> search1(long id);
 }
