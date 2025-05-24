@@ -1,11 +1,21 @@
 package kr.co.apiserver.service;
 
 import kr.co.apiserver.domain.Todo;
+import kr.co.apiserver.dto.PageRequestDto;
+import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.TodoDto;
 
 public interface TodoService {
 
     TodoDto get(Long tno);
+
+    Long register(TodoDto dto);
+
+    void modify(TodoDto dto);
+
+    void remove(Long tno);
+
+    PageResponseDto<TodoDto> getList(PageRequestDto pageRequestDto);
 
     default TodoDto entityToDto(Todo todo) {
         return TodoDto.builder()
