@@ -1,17 +1,19 @@
 package kr.co.apiserver.repository.search;
 
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.co.apiserver.common.util.QueryDslUtil;
 import kr.co.apiserver.domain.QTodo;
 import kr.co.apiserver.domain.Todo;
+import kr.co.apiserver.dto.PageRequestDto;
+import kr.co.apiserver.dto.TodoDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.data.domain.*;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,21 +27,32 @@ public class TodoSearchImpl implements TodoSearch {
     private static final QTodo todo = QTodo.todo;
 
     @Override
-    public Page<Todo> search1(long id) {
+    public Page<TodoDto> search1(PageRequestDto pageRequestDto, Pageable pageable) {
 
         log.info("search1........");
 
-        List<Todo> content = queryFactory
-                .selectFrom(todo)
-                .where(
-                    todo.title.contains("1"),
-                    hasLastData(id)
+        List<TodoDto> result = queryFactory
+                .select(
+                        Projections.fields(TodoDto.class,
+                                todo.tno,
+                                todo.title,
+                                todo.content,
+                                todo.complete,
+                                todo.dueDate
+                        )
                 )
-                .orderBy(todo.tno.desc())
-                .limit(10)
+                .from(todo)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(QueryDslUtil.toOrderSpecifier(pageable.getSort(), todo))
                 .fetch();
 
-        return null;
+        JPAQuery<Long> totalCount = queryFactory
+                .select(todo.count())
+                .from(todo);
+
+        return PageableExecutionUtils.getPage(result, pageable, totalCount::fetchOne);
+
     }
 
     private Predicate hasLastData(Long id) {

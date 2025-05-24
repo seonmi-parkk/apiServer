@@ -92,10 +92,10 @@ public class TodoRepositoryTest {
     }
 
 
-    @Test
-    public void testSearch1(){
-        todoRepository.search1(0L);
-    }
+//    @Test
+//    public void testSearch1(){
+//        todoRepository.search1(0L);
+//    }
 
 
 }
