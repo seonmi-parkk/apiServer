@@ -5,11 +5,11 @@ import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.TodoDto;
 import kr.co.apiserver.service.TodoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/todo")
@@ -28,5 +28,27 @@ public class TodoController {
     public PageResponseDto<TodoDto> getList(PageRequestDto pageRequestDto){
         log.info("list : " + pageRequestDto);
         return todoService.getList(pageRequestDto);
+    }
+
+    @PostMapping("/")
+    public Map<String, Long> register(@RequestBody TodoDto todoDto){
+        log.info("todoDto : " + todoDto);
+        Long tno = todoService.register(todoDto);
+
+        return Map.of("tno", tno);
+    }
+
+    @PutMapping("/{tno}")
+    public Map<String, String> modify(@PathVariable("tno") Long tno, @RequestBody TodoDto todoDto) {
+        todoDto.setTno(tno);
+        todoService.modify(todoDto);
+
+        return Map.of("result", "success");
+    }
+
+    @DeleteMapping("/{tno}")
+    public Map<String, String> remove(@PathVariable("tno") Long tno) {
+        todoService.remove(tno);
+        return Map.of("result", "success");
     }
 }
