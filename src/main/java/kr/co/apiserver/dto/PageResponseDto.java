@@ -39,7 +39,7 @@ public class PageResponseDto<E> {
         this.pageRequestDto = pageRequestDto;
         this.totalCount = (int) totalElements;
         this.totalPage = (int) totalPage;
-        this.currentPage = currentPage;
+        this.currentPage = currentPage + 1;
         this.isFirst = isFirst;
         this.isLast = isLast;
 

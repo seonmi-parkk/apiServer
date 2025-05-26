@@ -69,9 +69,9 @@ public class TodoRepositoryTest {
         Optional<Todo> result = todoRepository.findById(tno);
         Todo todo = result.orElseThrow();
 
-        todo.setTitle("Update Title22");
-        todo.setContent("Update Content22");
-        todo.setComplete(true);
+        todo.changeTitle("Update Title22");
+        todo.changeContent("Update Content22");
+        todo.changeComplete(true);
 
         // 변경 사항 확인용
         entityManager.flush();

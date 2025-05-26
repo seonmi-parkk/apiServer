@@ -20,23 +20,24 @@ public class Todo {
 
     @Column(length = 100, nullable = false)
     private String title;
+    private Long userId;
     private String content;
     private boolean complete;
     private LocalDate dueDate;
 
-    public void setTitle(String title) {
+    public void changeTitle(String title) {
         this.title = title;
     }
 
-    public void setContent(String content) {
+    public void changeContent(String content) {
         this.content = content;
     }
 
-    public void setComplete(boolean complete) {
+    public void changeComplete(boolean complete) {
         this.complete = complete;
     }
 
-    public void setDueDate(LocalDate dueDate) {
+    public void changeDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
