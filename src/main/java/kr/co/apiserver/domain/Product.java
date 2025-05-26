@@ -40,8 +40,12 @@ public class Product {
         this.name = name;
     }
 
+    public void changeDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     public void addImage(ProductImage image) {
-        image.setOrd(imageList.size() + 1);
+        image.setOrd(imageList.size());
         imageList.add(image);
     }
 
