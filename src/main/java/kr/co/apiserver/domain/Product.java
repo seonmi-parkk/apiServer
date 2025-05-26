@@ -1,0 +1,60 @@
+package kr.co.apiserver.domain;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Getter
+@Table(name="product")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString(exclude = "imageList") // 테스트할때 편하기 위해서 연관관계있는 애들은 제외
+public class Product {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long pno;
+
+    private String name;
+    private int price;
+    private String pdesc;
+    private boolean deleted;
+
+    @ElementCollection
+    @Builder.Default
+    private List<ProductImage> imageList = new ArrayList<>();
+
+    public void changePrice(int price) {
+        this.price = price;
+    }
+
+    public void changeDesc(String pdesc) {
+        this.pdesc = pdesc;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
+
+    public void addImage(ProductImage image) {
+        image.setOrd(imageList.size() + 1);
+        imageList.add(image);
+    }
+
+    public void addImageString(String fileName) {
+        // 상품수정시 기존파일 중 하나만 바꿀때 기존 것들의 이름을 문자열로 같이 저장하는 처리를 하기 위해서
+        ProductImage productImage = ProductImage.builder()
+                .fileName(fileName)
+                .build();
+
+        addImage(productImage);
+    }
+
+    public void clearList() {
+        this.imageList.clear();
+    }
+}
