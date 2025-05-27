@@ -36,8 +36,6 @@ public class TodoSearchImpl implements TodoSearch {
                         Projections.fields(TodoDto.class,
                                 todo.tno,
                                 todo.title,
-                                todo.content,
-                                todo.complete,
                                 todo.dueDate
                         )
                 )
@@ -55,11 +53,4 @@ public class TodoSearchImpl implements TodoSearch {
 
     }
 
-    private Predicate hasLastData(Long id) {
-        if (id == null) {
-            return null;
-        }
-
-        return todo.tno.lt(id);
-    }
 }
