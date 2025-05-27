@@ -1,6 +1,7 @@
 package kr.co.apiserver.domain;
 
 import jakarta.persistence.*;
+import kr.co.apiserver.dto.ProductDto;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -27,6 +28,35 @@ public class Product {
     @ElementCollection
     @Builder.Default
     private List<ProductImage> imageList = new ArrayList<>();
+
+
+    public static Product createProduct(ProductDto productDto) {
+        Product product = Product.builder()
+                .pno(productDto.getPno())
+                .name(productDto.getName())
+                .price(productDto.getPrice())
+                .pdesc(productDto.getDesc())
+                .deleted(productDto.isDeleted())
+                .build();
+
+        List<String> uploadedFileNames = productDto.getUploadedFileNames();
+        if(uploadedFileNames == null || uploadedFileNames.isEmpty()) {
+            return product;
+        }
+
+        uploadedFileNames.forEach(fileName -> {
+            product.addImageString(fileName);
+        });
+//        productDto.getFiles().forEach(file -> {
+//            ProductImage image = ProductImage.builder()
+//                    .fileName(file.getOriginalFilename())
+//                    .build();
+//            product.addImage(image);
+
+//        });
+
+        return product;
+    }
 
     public void changePrice(int price) {
         this.price = price;

@@ -1,6 +1,9 @@
 package kr.co.apiserver.controller;
 
+import kr.co.apiserver.dto.PageRequestDto;
+import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.ProductDto;
+import kr.co.apiserver.service.ProductService;
 import kr.co.apiserver.util.CustomFileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -19,24 +22,36 @@ import java.util.Map;
 public class ProductController {
 
     private final CustomFileUtil fileUtil;
+    private final ProductService productService;
 
-    @PostMapping("/")
-    public Map<String, String> register(ProductDto productDto) {
-        log.info("register: " + productDto);
 
-        List<MultipartFile> files = productDto.getFiles();
-
-        List<String> uploadedFileNames = fileUtil.saveFiles(files);
-
-        productDto.setUploadedFileNames(uploadedFileNames);
-
-        log.info(uploadedFileNames);
-
-        return Map.of("result", "success");
-    }
 
     @GetMapping("/view/{fileName}")
     public ResponseEntity<Resource> viewFileGet(@PathVariable("fileName") String fileName) {
        return fileUtil.getFile(fileName);
+    }
+
+    @GetMapping("/list")
+    public PageResponseDto<ProductDto> productList(PageRequestDto pageRequestDto) {
+        return productService.getList(pageRequestDto);
+    }
+
+    @PostMapping("/")
+    public Map<String, Long> register(ProductDto productDto) {
+
+        List<MultipartFile> files = productDto.getFiles();
+        List<String> uploadFilenames = fileUtil.saveFiles(files);
+        productDto.setUploadedFileNames(uploadFilenames);
+
+        log.info(uploadFilenames);
+
+        Long pno = productService.register(productDto);
+
+        return Map.of("result", pno);
+    }
+
+    @GetMapping("/{pno}")
+    public ProductDto read(@PathVariable("pno") Long pno) {
+        return productService.get(pno);
     }
 }

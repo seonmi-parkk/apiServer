@@ -39,16 +39,17 @@ public class TodoRepositoryTest {
 
     @Test
     public void testInsert(){
+        for (int i = 0; i < 100; i++) {
+            Todo todo = Todo.builder()
+                    .title("Title")
+                    .content("content...")
+                    .dueDate(LocalDate.of(2025,05,21))
+                    .build();
 
-        Todo todo = Todo.builder()
-                .title("Title")
-                .content("content...")
-                .dueDate(LocalDate.of(2025,05,21))
-                .build();
+            Todo result = todoRepository.save(todo);
 
-        Todo result = todoRepository.save(todo);
-
-        log.info(result);
+            log.info(result);
+        }
     }
 
     @Test

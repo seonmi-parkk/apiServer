@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.dto.PageRequestDto;
 import lombok.extern.log4j.Log4j2;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +15,6 @@ import org.springframework.test.annotation.Commit;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.UUID;
 
 @SpringBootTest
@@ -24,7 +22,7 @@ import java.util.UUID;
 public class ProductRepositoryTest {
 
     @Autowired
-    private ProductRepositroy productRepository;
+    private ProductRepository productRepository;
 
     @Test
     public void testInsert() {
@@ -93,9 +91,8 @@ public class ProductRepositoryTest {
 
     @Test
     public void testSearch() {
-        PageRequestDto pageRequestDto = PageRequestDto.builder().page(0).size(10).build();
-
-        productRepository.searchList(pageRequestDto);
+        PageRequestDto pageRequestDto = PageRequestDto.builder().build();
+        productRepository.searchList(pageRequestDto, pageRequestDto.toPageable());
     }
 
 }

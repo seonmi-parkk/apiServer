@@ -1,5 +1,7 @@
 package kr.co.apiserver.dto;
 
+import kr.co.apiserver.domain.Product;
+import kr.co.apiserver.domain.ProductImage;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,6 +20,19 @@ public class ProductDto {
     private int price;
     private String desc;
     private boolean deleted;
+
+    public static ProductDto fromEntity(Product product) {
+        return ProductDto.builder()
+                .pno(product.getPno())
+                .name(product.getName())
+                .price(product.getPrice())
+                .desc(product.getPdesc())
+                .deleted(product.isDeleted())
+                .uploadedFileNames(product.getImageList().stream()
+                        .map(ProductImage::getFileName)
+                        .toList())
+                .build();
+    }
 
     @Builder.Default
     private List<MultipartFile> files = new ArrayList<>(); // 파일 업로드시
