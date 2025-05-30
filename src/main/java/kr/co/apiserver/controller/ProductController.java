@@ -1,5 +1,6 @@
 package kr.co.apiserver.controller;
 
+import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.ProductDto;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @Log4j2
@@ -40,6 +42,8 @@ public class ProductController {
     public Map<String, Long> register(ProductDto productDto) {
 
         List<MultipartFile> files = productDto.getFiles();
+        log.info("files: " + files);
+        log.info("files.size: " + files.size());
         List<String> uploadFilenames = fileUtil.saveFiles(files);
         productDto.setUploadedFileNames(uploadFilenames);
 
@@ -53,5 +57,48 @@ public class ProductController {
     @GetMapping("/{pno}")
     public ProductDto read(@PathVariable("pno") Long pno) {
         return productService.get(pno);
+    }
+
+    @PutMapping("/{pno}")
+    public Map<String, String> modify(@PathVariable Long pno, ProductDto productDto) {
+
+        productDto.setPno(pno);
+
+        // 기존 productDto
+        ProductDto oldProductDto = productService.get(pno);
+
+        // 새로 upload된 file
+        List<MultipartFile> files = productDto.getFiles();
+        List<String> newUploadFileNames = fileUtil.saveFiles(files);
+
+        // 기존 이미지 중 keep 할 file
+        List<String> uploadedFileNames = productDto.getUploadedFileNames();
+
+        if(newUploadFileNames != null && !newUploadFileNames.isEmpty()) {
+            uploadedFileNames.addAll(newUploadFileNames);
+        }
+
+        productService.modify(productDto);
+
+        List<String> oldFileNames = oldProductDto.getUploadedFileNames();
+        if(oldFileNames != null && !oldFileNames.isEmpty()) {
+            List<String> removeFileNames = oldFileNames.stream().filter(fileName -> !uploadedFileNames.contains(fileName)).toList();
+
+            fileUtil.deleteFiles(removeFileNames);
+        }
+
+        return Map.of("result", "success");
+    }
+
+    @PatchMapping("/{pno}")
+    public Map<String, String> remove(@PathVariable Long pno) {
+        log.info("remove pno: " + pno);
+        List<String> oldFileNames = productService.get(pno).getUploadedFileNames();
+
+        productService.remove(pno);
+
+        fileUtil.deleteFiles(oldFileNames);
+
+        return Map.of("result", "success");
     }
 }

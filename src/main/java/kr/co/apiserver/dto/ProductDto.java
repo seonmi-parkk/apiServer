@@ -18,7 +18,7 @@ public class ProductDto {
     private Long pno;
     private String name;
     private int price;
-    private String desc;
+    private String pdesc;
     private boolean deleted;
 
     public static ProductDto fromEntity(Product product) {
@@ -26,7 +26,7 @@ public class ProductDto {
                 .pno(product.getPno())
                 .name(product.getName())
                 .price(product.getPrice())
-                .desc(product.getPdesc())
+                .pdesc(product.getPdesc())
                 .deleted(product.isDeleted())
                 .uploadedFileNames(product.getImageList().stream()
                         .map(ProductImage::getFileName)

@@ -44,6 +44,7 @@ public class ProductSearchImpl implements ProductSearch {
                 .select(product)
                 .from(product)
                 .leftJoin(product.imageList, productImage).fetchJoin()
+                .where(product.deleted.eq(false))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(QueryDslUtil.toOrderSpecifier(pageable.getSort(), product))

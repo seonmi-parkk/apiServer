@@ -35,7 +35,7 @@ public class Product {
                 .pno(productDto.getPno())
                 .name(productDto.getName())
                 .price(productDto.getPrice())
-                .pdesc(productDto.getDesc())
+                .pdesc(productDto.getPdesc())
                 .deleted(productDto.isDeleted())
                 .build();
 

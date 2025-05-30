@@ -1,5 +1,6 @@
 package kr.co.apiserver.service;
 
+import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.PageResponseDto;
@@ -71,5 +72,38 @@ public class ProductServiceImpl implements ProductService {
         Product product = result.orElseThrow();
 
         return ProductDto.fromEntity(product);
+    }
+
+    @Transactional
+    @Override
+    public void modify(ProductDto productDto) {
+        // 조회
+        Optional<Product> result = productRepository.findById(productDto.getPno());
+        Product product = result.orElseThrow();
+
+        // 변경내용 반영
+        product.changePrice(productDto.getPrice());
+        product.changeName(productDto.getName());
+        product.changeDesc(productDto.getPdesc());
+        product.changeDeleted(productDto.isDeleted());
+
+        // 이미지 처리
+        List<String> uploadFileNames = productDto.getUploadedFileNames();
+
+        product.clearList();
+
+        if (uploadFileNames != null && !uploadFileNames.isEmpty()) {
+            uploadFileNames.forEach(fileName -> {
+                product.addImageString(fileName);
+            });
+        }
+
+    }
+
+    @Transactional
+    @Override
+    public void remove(Long pno) {
+        Product product = productRepository.findById(pno).orElseThrow();
+        product.changeDeleted(true);
     }
 }
