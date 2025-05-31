@@ -5,9 +5,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.apiserver.dto.UserDto;
+import kr.co.apiserver.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,7 +18,12 @@ import java.util.Map;
 import java.util.Objects;
 
 @Log4j2
+@Component
+@RequiredArgsConstructor
 public class ApiLoginSuccessHandler implements AuthenticationSuccessHandler {
+
+    private final JwtUtil jwtUtil;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("onAuthenticationSuccess : " + authentication);
@@ -23,8 +31,11 @@ public class ApiLoginSuccessHandler implements AuthenticationSuccessHandler {
         UserDto userDto = (UserDto) authentication.getPrincipal();
         Map<String, Object> claims = userDto.getClaims();
 
-        claims.put("accessToken", "");
-        claims.put("refreshToken", "");
+        String accessToken = jwtUtil.createAccessToken(claims);
+        String refreshToken = jwtUtil.createRefreshToken();
+
+        claims.put("accessToken", accessToken);
+        claims.put("refreshToken", refreshToken);
 
         Gson gson = new Gson();
         String jsonStr = gson.toJson(claims);
