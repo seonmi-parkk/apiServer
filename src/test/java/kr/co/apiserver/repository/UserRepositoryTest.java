@@ -20,7 +20,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testInsertUser(){
-        for (int i=10; i<14; i++) {
+        for (int i=14; i<15; i++) {
             User user = User.builder()
                     .email("user" + i + "@test.com")
                     .password(passwordEncoder.encode("1111"))
@@ -28,13 +28,13 @@ public class UserRepositoryTest {
                     .build();
             user.addRole(UserRole.USER);
 
-            if(i >= 5) {
-                user.addRole(UserRole.MANAGER);
-            }
-
-            if(i >= 8) {
-                user.addRole(UserRole.ADMIN);
-            }
+//            if(i >= 5) {
+//                user.addRole(UserRole.MANAGER);
+//            }
+//
+//            if(i >= 8) {
+//                user.addRole(UserRole.ADMIN);
+//            }
 
             userRepository.save(user);
         }

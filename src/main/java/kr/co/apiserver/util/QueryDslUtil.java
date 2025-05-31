@@ -1,9 +1,8 @@
-package kr.co.apiserver.common.util;
+package kr.co.apiserver.util;
 
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Path;
 import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.core.types.dsl.PathBuilder;
 import org.springframework.data.domain.Sort;

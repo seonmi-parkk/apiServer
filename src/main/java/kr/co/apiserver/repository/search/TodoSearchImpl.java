@@ -1,13 +1,10 @@
 package kr.co.apiserver.repository.search;
 
-import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.co.apiserver.common.util.QueryDslUtil;
+import kr.co.apiserver.util.QueryDslUtil;
 import kr.co.apiserver.domain.QTodo;
-import kr.co.apiserver.domain.Todo;
 import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.TodoDto;
 import lombok.RequiredArgsConstructor;

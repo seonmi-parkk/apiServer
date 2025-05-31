@@ -1,16 +1,19 @@
 package kr.co.apiserver.config;
 
-import kr.co.apiserver.security.ApiLoginFailHandler;
-import kr.co.apiserver.security.ApiLoginSuccessHandler;
+import kr.co.apiserver.security.*;
+import kr.co.apiserver.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -20,10 +23,16 @@ import java.util.Arrays;
 @Log4j2
 @Configuration
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class SecurityConfig {
 
+    private final ApiLoginSuccessHandler apiLoginSuccessHandler;
+    private final ApiLoginFailHandler apiLoginFailHandler;
+    private final AccessDeniedHandlerImpl accessDeniedHandler;
+
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {
 
         log.info("-------secrityFilterChain()-------");
 
@@ -40,9 +49,15 @@ public class SecurityConfig {
         http.formLogin((formLogin) ->
                 formLogin
                         .loginPage("/api/member/login")
-                        .successHandler(new ApiLoginSuccessHandler())
-                        .failureHandler(new ApiLoginFailHandler())
+                        .successHandler(apiLoginSuccessHandler)
+                        .failureHandler(apiLoginFailHandler)
         );
+
+        http.addFilterBefore(new JwtCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
+        http.exceptionHandling(config -> {
+            config.accessDeniedHandler(accessDeniedHandler);
+        });
 
         return http.build();
     }

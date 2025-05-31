@@ -1,4 +1,4 @@
-package kr.co.apiserver.common.config;
+package kr.co.apiserver.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
