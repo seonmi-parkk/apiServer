@@ -28,10 +28,20 @@ public class JwtCheckFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        String path = request.getRequestURI();
-        log.info("check uri: " + path);
+        // priflight 요청
+        if(request.getMethod().equals("OPTIONS")){
+            return true;
+        }
 
+        String path = request.getRequestURI();
+
+        // 로그인 관련 요청
         if(path.startsWith("/user/") ) {
+            return true;
+        }
+
+        // 이미지 조회 경로
+        if(path.startsWith("/api/products/view/") ) {
             return true;
         }
 

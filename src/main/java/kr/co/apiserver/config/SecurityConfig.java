@@ -4,6 +4,7 @@ import kr.co.apiserver.security.*;
 import kr.co.apiserver.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -34,28 +35,35 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {
 
-        log.info("-------secrityFilterChain()-------");
-
         http.cors(httpSecurityCorsConfigurer -> {
             httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource());
         });
 
         http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
-            httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.NEVER); // 세션을 사용하지 않음
+            httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션을 사용하지 않음
         });
 
         http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());
 
         http.formLogin((formLogin) ->
                 formLogin
-                        .loginPage("/api/member/login")
+                        .loginPage("/user/login")
                         .successHandler(apiLoginSuccessHandler)
                         .failureHandler(apiLoginFailHandler)
+        );
+
+        http.authorizeHttpRequests((authorizeHttpRequests) ->
+                authorizeHttpRequests
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
+                        .requestMatchers("/", "/user/**").permitAll() // 메인, 로그인, 회원가입 페이지 접근 허용
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
         http.addFilterBefore(new JwtCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         http.exceptionHandling(config -> {
+            config.authenticationEntryPoint(new CustomJwtEntryPoint());
             config.accessDeniedHandler(accessDeniedHandler);
         });
 

@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.apiserver.dto.UserDto;
+import kr.co.apiserver.service.RedisService;
 import kr.co.apiserver.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,6 +24,7 @@ import java.util.Objects;
 public class ApiLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtUtil jwtUtil;
+    private final RedisService redisService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -32,7 +34,9 @@ public class ApiLoginSuccessHandler implements AuthenticationSuccessHandler {
         Map<String, Object> claims = userDto.getClaims();
 
         String accessToken = jwtUtil.createAccessToken(claims);
-        String refreshToken = jwtUtil.createRefreshToken();
+        String refreshToken = jwtUtil.createRefreshToken(claims);
+
+        redisService.saveRefreshToken(userDto.getUsername(), refreshToken);
 
         claims.put("accessToken", accessToken);
         claims.put("refreshToken", refreshToken);
