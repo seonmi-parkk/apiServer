@@ -34,24 +34,21 @@ public class JwtCheckFilter extends OncePerRequestFilter {
         }
 
         String path = request.getRequestURI();
-
-        // 로그인 관련 요청
-        if(path.startsWith("/user/") ) {
+        // 로그인 관련 요청 / 이미지 조회 경로
+        if( path.startsWith("/user/login")
+            || path.startsWith("/user/auth/kakao")
+            || path.startsWith("/user/refresh")
+            || path.startsWith("/api/products/view/")
+        ) {
             return true;
         }
 
-        // 이미지 조회 경로
-        if(path.startsWith("/api/products/view/") ) {
-            return true;
-        }
-
-        // false == check
+        // false => check
         return false;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("doFilterInternal" );
 
         try {
             String authorizationHeader = request.getHeader("Authorization");
@@ -79,7 +76,7 @@ public class JwtCheckFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
 
-            // 에러코드 결정
+            // 에러코드
             ErrorCode errorCode = ErrorCode.UNAUTHORIZED;
             if (e instanceof CustomAuthenticationException customEx) {
                 errorCode = customEx.getErrorCode();

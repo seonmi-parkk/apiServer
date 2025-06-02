@@ -14,6 +14,7 @@ public enum ErrorCode {
     NOT_FOUND_REFRESH_TOKEN(401, 40103, "리프레시 토큰이 존재하지 않습니다."),
     FORBIDDEN(403, 40300, "FORBIDDEN"),
     NOT_FOUND(404, 40400, "NOT_FOUND_DATA"),
+    USER_NOT_FOUND(404, 40401, "USER_NOT_FOUND"),
     INTERNAL_ERROR(500, 50000, "INTERNAL_SERVER_ERROR");
 
     private final int status;

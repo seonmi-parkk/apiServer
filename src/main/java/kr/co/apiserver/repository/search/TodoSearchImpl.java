@@ -24,30 +24,26 @@ public class TodoSearchImpl implements TodoSearch {
     private static final QTodo todo = QTodo.todo;
 
     @Override
-    public Page<TodoDto> search1(PageRequestDto pageRequestDto, Pageable pageable) {
-
-        log.info("search1........");
-
+    public Page<TodoDto> search(PageRequestDto pageRequestDto, Pageable pageable) {
         List<TodoDto> result = queryFactory
-                .select(
-                        Projections.fields(TodoDto.class,
-                                todo.tno,
-                                todo.title,
-                                todo.dueDate
-                        )
+            .select(
+                Projections.fields(TodoDto.class,
+                    todo.tno,
+                    todo.title,
+                    todo.dueDate
                 )
-                .from(todo)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(QueryDslUtil.toOrderSpecifier(pageable.getSort(), todo))
-                .fetch();
+            )
+            .from(todo)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .orderBy(QueryDslUtil.toOrderSpecifier(pageable.getSort(), todo))
+            .fetch();
 
         JPAQuery<Long> totalCount = queryFactory
-                .select(todo.count())
-                .from(todo);
+            .select(todo.count())
+            .from(todo);
 
         return PageableExecutionUtils.getPage(result, pageable, totalCount::fetchOne);
-
     }
 
 }

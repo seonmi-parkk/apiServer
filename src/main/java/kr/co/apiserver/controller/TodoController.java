@@ -3,10 +3,12 @@ package kr.co.apiserver.controller;
 import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.TodoDto;
+import kr.co.apiserver.dto.UserDto;
 import kr.co.apiserver.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -25,16 +27,14 @@ public class TodoController {
     }
 
     @GetMapping("/list")
-    public PageResponseDto<TodoDto> getList(PageRequestDto pageRequestDto){
-        log.info("list : " + pageRequestDto);
+    public PageResponseDto<TodoDto> getList(@AuthenticationPrincipal UserDto userDto, PageRequestDto pageRequestDto){
+        log.info("getList - user: " + userDto.getEmail());
         return todoService.getList(pageRequestDto);
     }
 
     @PostMapping("/")
     public Map<String, Long> register(@RequestBody TodoDto todoDto){
-        log.info("todoDto : " + todoDto);
         Long tno = todoService.register(todoDto);
-
         return Map.of("tno", tno);
     }
 
@@ -42,7 +42,6 @@ public class TodoController {
     public Map<String, String> modify(@PathVariable("tno") Long tno, @RequestBody TodoDto todoDto) {
         todoDto.setTno(tno);
         todoService.modify(todoDto);
-
         return Map.of("result", "success");
     }
 
@@ -51,4 +50,5 @@ public class TodoController {
         todoService.remove(tno);
         return Map.of("result", "success");
     }
+
 }
