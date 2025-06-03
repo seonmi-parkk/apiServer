@@ -5,19 +5,14 @@ import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.ProductDto;
-import kr.co.apiserver.dto.TodoDto;
 import kr.co.apiserver.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Log4j2
@@ -83,7 +78,7 @@ public class ProductServiceImpl implements ProductService {
 
         // 변경내용 반영
         product.changePrice(productDto.getPrice());
-        product.changeName(productDto.getName());
+        product.changeName(productDto.getPname());
         product.changeDesc(productDto.getPdesc());
         product.changeDeleted(productDto.isDeleted());
 

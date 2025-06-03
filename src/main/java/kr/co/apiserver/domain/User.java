@@ -15,6 +15,7 @@ import java.util.List;
 public class User {
     @Id
     private String email;
+
     private String password;
     private String nickname;
     private boolean isSocial;
@@ -43,4 +44,6 @@ public class User {
     public void changeSocial(boolean isSocial) {
         this.isSocial = isSocial;
     }
+
+
 }

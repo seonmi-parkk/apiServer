@@ -20,7 +20,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pno;
 
-    private String name;
+    private String pname;
     private int price;
     private String pdesc;
     private boolean deleted;
@@ -33,7 +33,7 @@ public class Product {
     public static Product createProduct(ProductDto productDto) {
         Product product = Product.builder()
                 .pno(productDto.getPno())
-                .name(productDto.getName())
+                .pname(productDto.getPname())
                 .price(productDto.getPrice())
                 .pdesc(productDto.getPdesc())
                 .deleted(productDto.isDeleted())
@@ -67,7 +67,7 @@ public class Product {
     }
 
     public void changeName(String name) {
-        this.name = name;
+        this.pname = name;
     }
 
     public void changeDeleted(boolean deleted) {

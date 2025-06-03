@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.co.apiserver.domain.UserRole;
 import kr.co.apiserver.dto.UserDto;
 import kr.co.apiserver.service.RedisService;
 import kr.co.apiserver.util.JwtUtil;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -30,19 +33,25 @@ public class ApiLoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("onAuthenticationSuccess : " + authentication);
 
-        UserDto userDto = (UserDto) authentication.getPrincipal();
-        Map<String, Object> claims = userDto.getClaims();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        //Map<String, Object> claims = userDto.getClaims();
+        log.info("userDetails : " + userDetails);
+        log.info("userDetails.getUser() : " + userDetails.getUser());
+        String accessToken = jwtUtil.createAccessToken(userDetails.getUser());
+        String refreshToken = jwtUtil.createRefreshToken(userDetails.getUsername());
 
-        String accessToken = jwtUtil.createAccessToken(claims);
-        String refreshToken = jwtUtil.createRefreshToken(claims);
+        redisService.saveRefreshToken(userDetails.getUsername(), refreshToken);
 
-        redisService.saveRefreshToken(userDto.getUsername(), refreshToken);
+        Map<String, String> userInfo = userDetails.getUserInfo();
 
-        claims.put("accessToken", accessToken);
-        claims.put("refreshToken", refreshToken);
+        log.info("====== userInfo : " + userInfo);
+        log.info("====== accessToken : " + accessToken);
+        log.info("====== refreshToken : " + refreshToken);
+        userInfo.put("accessToken", accessToken);
+        userInfo.put("refreshToken", refreshToken);
 
         Gson gson = new Gson();
-        String jsonStr = gson.toJson(claims);
+        String jsonStr = gson.toJson(userInfo);
 
         response.setContentType("application/json; charset=UTF-8");
 

@@ -1,5 +1,6 @@
 package kr.co.apiserver.dto;
 
+import kr.co.apiserver.domain.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,19 +17,19 @@ public class UserDto extends User {
     private String password;
     private String nickname;
     private boolean isSocial;
-    private List<String> roleNames = new ArrayList<>();
+    private List<UserRole> roles = new ArrayList<>();
 
-    public UserDto(String email, String password, String nickname, boolean isSocial, List<String> roleNames) {
+    public UserDto(String email, String password, String nickname, boolean isSocial, List<UserRole> roles) {
         super(
                 email,
                 password,
-                roleNames.stream().map(str -> new SimpleGrantedAuthority("ROLE_"+str)).toList());
+                roles.stream().map(str -> new SimpleGrantedAuthority(str.getAuthority())).toList());
 
         this.email = email;
         this.password = password;
         this.nickname = nickname;
         this.isSocial = isSocial;
-        this.roleNames = roleNames;
+        this.roles = roles;
     }
 
     public Map<String, Object> getClaims() {
@@ -37,7 +38,7 @@ public class UserDto extends User {
         claims.put("password", password);
         claims.put("nickname", nickname);
         claims.put("isSocial", isSocial);
-        claims.put("roleNames", roleNames);
+        claims.put("roleNames", roles.stream().map(role -> role.name()).toList());
         return claims;
     }
 
@@ -48,9 +49,6 @@ public class UserDto extends User {
                 user.getNickname(),
                 user.isSocial(),
                 user.getUserRoleList()
-                        .stream()
-                        .map(role -> role.name())
-                        .toList()
         );
     }
 

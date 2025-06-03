@@ -26,9 +26,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         User user = userRepository.getWithRoles(username).orElseThrow(()->new UsernameNotFoundException("유저를 찾을 수 없습니다."));
 
-        UserDto userDto = UserDto.fromEntity(user);
+        //UserDto userDto = UserDto.fromEntity(user);
 
-        return userDto;
+        return new UserDetailsImpl(user);
     }
 
 }

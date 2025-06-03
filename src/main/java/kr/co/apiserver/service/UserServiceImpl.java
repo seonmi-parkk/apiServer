@@ -25,6 +25,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,21 +64,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, Object> refreshAccessToken(String refreshToken) {
-        // Refresh 토큰 검증
-        jwtUtil.validateToken(refreshToken);
-        log.info(" Refresh 토큰 검증");
+    public Map<String, String> refreshAccessToken(String refreshToken) {
+        // 토큰 유효성 검증
+        String username = jwtUtil.validateToken(refreshToken);
+        User user = userRepository.getWithRoles(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // claims 가져오기
-        Map<String, Object> claims = jwtUtil.parseClaims(refreshToken);
+        Map<String, String> tokens = jwtUtil.refreshAccessToken(refreshToken, user);
 
-        // Access 토큰 재발급
-        String newAccessToken = jwtUtil.createAccessToken(claims);
-
-        // Refresh Token의 유효기간이 2일 이하인 경우 재뱔급
-        String newRefreshToken = jwtUtil.isRefreshTokenAboutToExpire(refreshToken) ? jwtUtil.createRefreshToken(claims) : refreshToken;
-
-        return Map.of("accessToken", newAccessToken, "refreshToken", newRefreshToken);
+        return tokens;
     }
 
     @Override
@@ -94,7 +88,7 @@ public class UserServiceImpl implements UserService {
         // 기존 회원
         if(result.isPresent()) {
             // acceesssToken, refreshToken 생성
-            return createTokens(UserDto.fromEntity(result.get()));
+            return createTokens(result.get());
         }
 
         // 신규 회원 가입
@@ -102,7 +96,7 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(socialUser);
 
         // acceesssToken, refreshToken 생성
-        return createTokens(UserDto.fromEntity(socialUser));
+        return createTokens(savedUser);
     }
 
     private String getAccessTokenFromKakao(String code){
@@ -156,17 +150,19 @@ public class UserServiceImpl implements UserService {
         return kakakoAccount.get("email");
     }
 
-    private Map<String,Object> createTokens(UserDto userDto) {
-        Map<String,Object> claims = userDto.getClaims();
+    private Map<String,Object> createTokens(User user) {
+        Map<String,Object> claims = UserDto.fromEntity(user).getClaims();
 
-        String jwtAccessToken = jwtUtil.createAccessToken(claims);
-        String jwtRefreshToken = jwtUtil.createRefreshToken(claims);
+        String username = user.getEmail();
+
+        String jwtAccessToken = jwtUtil.createAccessToken(user);
+        String jwtRefreshToken = jwtUtil.createRefreshToken(username);
 
         claims.put("accessToken", jwtAccessToken);
         claims.put("refreshToken", jwtRefreshToken);
 
         // Redis에 Refresh Token 저장
-        redisService.saveRefreshToken(userDto.getEmail(), jwtRefreshToken);
+        redisService.saveRefreshToken(username, jwtRefreshToken);
         return claims;
     }
 

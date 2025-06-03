@@ -11,5 +11,5 @@ public interface UserService {
 
     Map<String, Object> loginWithKakao(String code);
 
-    Map<String, Object> refreshAccessToken(String refreshToken);
+    Map<String, String> refreshAccessToken(String refreshToken);
 }

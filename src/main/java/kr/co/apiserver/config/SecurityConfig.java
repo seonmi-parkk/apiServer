@@ -35,23 +35,22 @@ public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsServiceImpl;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {
 
+        // CORS 설정
         http.cors(httpSecurityCorsConfigurer -> {
             httpSecurityCorsConfigurer.configurationSource(corsConfigurationSource());
         });
 
+        // 세션 사용X
         http.sessionManagement(httpSecuritySessionManagementConfigurer -> {
-            httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS); // 세션을 사용하지 않음
+            httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         });
 
+        // CSRF 비활성화
         http.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());
 
+        // 로그인 설정
         http.formLogin((formLogin) ->
                 formLogin
                         .loginPage("/user/login")
@@ -59,18 +58,22 @@ public class SecurityConfig {
                         .failureHandler(apiLoginFailHandler)
         );
 
+        // 접근 제한 설정
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
-                        .requestMatchers("/", "/user/**").permitAll() // 메인, 로그인, 회원가입 페이지 접근 허용
+
+                        .requestMatchers("/", "/user/**", "/products/view/**").permitAll() // 메인, 로그인, 회원가입 페이지 접근 허용
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
 
         http.userDetailsService(userDetailsServiceImpl);
 
-        http.addFilterBefore(new JwtCheckFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        // JWT 필터
+        http.addFilterBefore(new JwtCheckFilter(jwtUtil,userDetailsServiceImpl), UsernamePasswordAuthenticationFilter.class);
 
+        // 예외 처리 설정
         http.exceptionHandling(config -> {
             config.authenticationEntryPoint(new CustomJwtEntryPoint());
             config.accessDeniedHandler(accessDeniedHandler);

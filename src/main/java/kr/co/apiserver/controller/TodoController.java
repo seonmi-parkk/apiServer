@@ -4,6 +4,7 @@ import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.TodoDto;
 import kr.co.apiserver.dto.UserDto;
+import kr.co.apiserver.security.UserDetailsImpl;
 import kr.co.apiserver.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -27,8 +28,8 @@ public class TodoController {
     }
 
     @GetMapping("/list")
-    public PageResponseDto<TodoDto> getList(@AuthenticationPrincipal UserDto userDto, PageRequestDto pageRequestDto){
-        log.info("getList - user: " + userDto.getEmail());
+    public PageResponseDto<TodoDto> getList(@AuthenticationPrincipal UserDetailsImpl userDetails, PageRequestDto pageRequestDto){
+        log.info("getList - user: " + userDetails.getUsername());
         return todoService.getList(pageRequestDto);
     }
 

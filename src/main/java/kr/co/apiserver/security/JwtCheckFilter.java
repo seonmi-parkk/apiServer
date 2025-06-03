@@ -1,6 +1,7 @@
 package kr.co.apiserver.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,7 +14,9 @@ import kr.co.apiserver.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -25,6 +28,7 @@ import java.util.Map;
 public class JwtCheckFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
@@ -38,7 +42,7 @@ public class JwtCheckFilter extends OncePerRequestFilter {
         if( path.startsWith("/user/login")
             || path.startsWith("/user/auth/kakao")
             || path.startsWith("/user/refresh")
-            || path.startsWith("/api/products/view/")
+            || path.startsWith("/products/view/")
         ) {
             return true;
         }
@@ -54,25 +58,28 @@ public class JwtCheckFilter extends OncePerRequestFilter {
             String authorizationHeader = request.getHeader("Authorization");
 
             String accessToken = authorizationHeader.substring(7);
-            Map<String, Object> claims = jwtUtil.validateToken(accessToken);
-            log.info("claims : " + claims);
+            String username = jwtUtil.validateToken(accessToken);
+           // log.info("claims : " + claims);
 
-            String email = (String) claims.get("email");
-            String password = (String) claims.get("password");
-            String nickname = (String) claims.get("nickname");
-            Boolean isSocial = (Boolean) claims.get("isSocial");
-            List<String> roleNames = (List<String>) claims.get("roleNames");
+//            String email = (String) claims.get("email");
+//            String password = (String) claims.get("password");
+//            String nickname = (String) claims.get("nickname");
+//            Boolean isSocial = (Boolean) claims.get("isSocial");
+//            List<String> roleNames = (List<String>) claims.get("roleNames");
 
-            UserDto userDto = new UserDto(email, password, nickname, isSocial, roleNames);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            log.info("-------------userDto : " + userDto);
-            log.info("-------------userDto : " + userDto.getAuthorities());
+            //UserDto userDto = new UserDto(email, password, nickname, isSocial, roleNames);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDto, password, userDto.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            log.info("-------------userDetails : " + userDetails);
+            log.info("-------------userDetails.getAuthorities() : " + userDetails.getAuthorities());
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
 
             filterChain.doFilter(request, response);
         } catch (Exception e) {
+            log.error("doFilterInternal : " + e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
 
