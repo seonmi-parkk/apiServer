@@ -26,7 +26,7 @@ public class ProductSerivceTest {
     @Test
     public void testRegister() {
         ProductDto productDto = ProductDto.builder()
-                .name("새로운 상품")
+                .pname("새로운 상품")
                 .pdesc("상품 설명")
                 .price(1000)
                 .build();

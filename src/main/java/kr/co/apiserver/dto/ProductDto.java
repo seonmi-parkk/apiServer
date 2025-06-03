@@ -16,7 +16,7 @@ import java.util.List;
 public class ProductDto {
 
     private Long pno;
-    private String name;
+    private String pname;
     private int price;
     private String pdesc;
     private boolean deleted;
@@ -24,7 +24,7 @@ public class ProductDto {
     public static ProductDto fromEntity(Product product) {
         return ProductDto.builder()
                 .pno(product.getPno())
-                .name(product.getName())
+                .pname(product.getPname())
                 .price(product.getPrice())
                 .pdesc(product.getPdesc())
                 .deleted(product.isDeleted())

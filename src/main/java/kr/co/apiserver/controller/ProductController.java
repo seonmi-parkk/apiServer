@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RestController
 @Log4j2
 @RequiredArgsConstructor
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 public class ProductController {
 
     private final CustomFileUtil fileUtil;
@@ -34,7 +34,7 @@ public class ProductController {
        return fileUtil.getFile(fileName);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/list")
     public PageResponseDto<ProductDto> productList(PageRequestDto pageRequestDto) {
         return productService.getList(pageRequestDto);

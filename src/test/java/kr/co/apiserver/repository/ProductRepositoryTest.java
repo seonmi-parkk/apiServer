@@ -28,7 +28,7 @@ public class ProductRepositoryTest {
     public void testInsert() {
 
         for (int i = 0; i < 10; i++) {
-            Product product = Product.builder().name("test").pdesc("desc").price(10000).build();
+            Product product = Product.builder().pname("test").pdesc("desc").price(10000).build();
 
             product.addImageString(UUID.randomUUID()+"_"+"image1.jpg");
             product.addImageString(UUID.randomUUID()+"_"+"image2.jpg");

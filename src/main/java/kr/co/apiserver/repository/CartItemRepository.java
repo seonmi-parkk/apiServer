@@ -1,0 +1,29 @@
+package kr.co.apiserver.repository;
+
+import kr.co.apiserver.domain.CartItem;
+import kr.co.apiserver.dto.CartItemListDto;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+
+public interface CartItemRepository extends JpaRepository<CartItem, Long> {
+
+    // 유저 email로 모든 장바구니 아이템 가져오기
+    @Query("select " +
+            "new kr.co.apiserver.dto.CartItemListDto(ci.cino, p.pname, p.price, pi.fileName) " +
+            "from CartItem ci inner join Cart c on ci.cart = c " +
+            " left join Product p on ci.product = p " +
+            " left join p.imageList pi " +
+            "where " +
+            " c.user.email = :email and pi.ord = 0 " +
+            "order by ci.cino desc")
+    List<Object[]> getItemsOfCartByEmail(String email);
+
+    // 해당 상품이 장바구니 아이템으로 존재하는지 확인
+
+    // 장바구니 아이템 번호로 장바구니 번호 확인
+
+    // 장바구니 no로 모든 장바구니 아이템 조회
+
+}
