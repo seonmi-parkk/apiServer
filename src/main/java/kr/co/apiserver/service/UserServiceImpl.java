@@ -70,10 +70,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.getWithRoles(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Map<String, String> tokens = jwtUtil.refreshAccessToken(refreshToken, user);
-
+        redisService.saveRefreshToken(user.getEmail(), tokens.get("refreshToken"));
         return tokens;
     }
 
+    @Transactional
     @Override
     public Map<String,Object> loginWithKakao(String code) {
         // 인가 코드로 액세스 토큰 요청

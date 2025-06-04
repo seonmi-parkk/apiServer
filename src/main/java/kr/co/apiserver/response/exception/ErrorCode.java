@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ErrorCode {
     BAD_REQUEST(400, 40000, "BAD_REQUEST"),
+    CART_DUPLICATE_ITEM(200, 40001, "이미 장바구니에 담긴 상품입니다."),
     UNAUTHORIZED(401, 40100, "UNAUTHORIZED"),
     INVALID_TOKEN(401, 40101, "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN(401, 40102, "토큰이 만료되었습니다."),
