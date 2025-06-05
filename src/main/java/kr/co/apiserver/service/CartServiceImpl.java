@@ -8,6 +8,7 @@ import kr.co.apiserver.dto.CartItemDto;
 import kr.co.apiserver.dto.CartItemListDto;
 import kr.co.apiserver.repository.CartItemRepository;
 import kr.co.apiserver.repository.CartRepository;
+import kr.co.apiserver.repository.ProductRepository;
 import kr.co.apiserver.response.exception.CustomException;
 import kr.co.apiserver.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final ProductRepository productRepository;
 
     @Override
     public List<CartItemListDto> addItem(CartItemDto cartItemDto) {
@@ -42,7 +44,7 @@ public class CartServiceImpl implements CartService {
         Cart cart = findCart(email);
 
         // 장바구니 아이템 생성
-        Product product = Product.builder().pno(pno).build();
+        Product product = productRepository.findById(pno).orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
         cartItem = CartItem.builder()
                 .cart(cart)
                 .product(product)

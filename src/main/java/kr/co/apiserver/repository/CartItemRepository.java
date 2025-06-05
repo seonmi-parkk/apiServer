@@ -12,7 +12,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     // 유저 email로 모든 장바구니 아이템 가져오기
     @Query("select " +
-            "new kr.co.apiserver.dto.CartItemListDto(ci.cino, p.pname, p.price, pi.fileName) " +
+            "new kr.co.apiserver.dto.CartItemListDto(ci.cino, p.pno, p.pname, p.price, pi.fileName) " +
             "from CartItem ci inner join Cart c on ci.cart = c " +
             " join Product p on ci.product = p " +
             " join p.imageList pi " +
@@ -31,7 +31,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     // 장바구니 no로 모든 장바구니 아이템 조회
     @Query("select " +
-            "new kr.co.apiserver.dto.CartItemListDto(ci.cino, p.pname, p.price, pi.fileName) " +
+            "new kr.co.apiserver.dto.CartItemListDto(ci.cino, p.pno, p.pname, p.price, pi.fileName) " +
             "from CartItem ci join Cart c on ci.cart = c " +
             "join Product p on ci.product = p " +
             "left join p.imageList pi " +

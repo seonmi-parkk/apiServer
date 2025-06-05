@@ -50,7 +50,7 @@ public class CustomFileUtil {
         List<String> uploadNames = new ArrayList<>();
         for(MultipartFile file : files) {
 
-            if(file.getOriginalFilename() == null && file.getOriginalFilename().isEmpty()) {
+            if(file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
                 continue;
             }
 
