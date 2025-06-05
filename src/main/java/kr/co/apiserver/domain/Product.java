@@ -25,10 +25,10 @@ public class Product {
     private String pdesc;
     private boolean deleted;
 
-    @ElementCollection
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("ord asc")
     @Builder.Default
     private List<ProductImage> imageList = new ArrayList<>();
-
 
     public static Product createProduct(ProductDto productDto) {
         Product product = Product.builder()
@@ -75,7 +75,7 @@ public class Product {
     }
 
     public void addImage(ProductImage image) {
-        image.setOrd(imageList.size());
+        image.setProduct(this);
         imageList.add(image);
     }
 
@@ -83,12 +83,13 @@ public class Product {
         // 상품수정시 기존파일 중 하나만 바꿀때 기존 것들의 이름을 문자열로 같이 저장하는 처리를 하기 위해서
         ProductImage productImage = ProductImage.builder()
                 .fileName(fileName)
+                .ord(imageList.size())
                 .build();
 
         addImage(productImage);
     }
 
-    public void clearList() {
-        this.imageList.clear();
-    }
+//    public void clearList() {
+//        this.imageList.clear();
+//    }
 }

@@ -1,6 +1,7 @@
 package kr.co.apiserver.repository;
 
 import kr.co.apiserver.domain.Product;
+import kr.co.apiserver.dto.ProductDto;
 import kr.co.apiserver.repository.search.ProductSearch;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,9 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, ProductSearch {
 
+    @Query("select p from Product p left join fetch p.imageList where p.pno = :pno")
+    Optional<Product> findByIdWithImages(Long pno);
+
     @EntityGraph(attributePaths = "imageList")
     @Query("SELECT p FROM Product p WHERE p.pno = :pno")
     Optional<Product> selectOne(@Param("pno") Long pno);
@@ -22,6 +26,4 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     @Query("update Product p set p.deleted = :deleted where p.pno = :pno")
     void updateToDelete(@Param("pno") Long pno, @Param("deleted") boolean deleted);
 
-    @Query("select p,pi from Product p left join p.imageList pi where pi.ord = 0 and p.deleted = false")
-    Page<Object[]> selectList(Pageable pageable);
 }

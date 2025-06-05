@@ -72,21 +72,12 @@ public class ProductRepositoryTest {
         Product product = productRepository.selectOne(3L).orElseThrow(NoSuchElementException::new);
         product.changePrice(3000);
 
-        product.clearList();
+        //product.clearList();
         product.addImageString(UUID.randomUUID()+"_"+"Pimage1.jpg");
         product.addImageString(UUID.randomUUID()+"_"+"Pimage2.jpg");
         product.addImageString(UUID.randomUUID()+"_"+"Pimage3.jpg");
 
         productRepository.save(product);
-    }
-
-    @Test
-    public void testList() {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by("pno").descending());
-
-        Page<Object[]> result = productRepository.selectList(pageable);
-
-        result.getContent().forEach(arr -> log.info(Arrays.toString(arr)));
     }
 
     @Test

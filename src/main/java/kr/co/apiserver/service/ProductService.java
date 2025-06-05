@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.ProductDto;
+import kr.co.apiserver.dto.ProductModifyRequestDto;
 
 @Transactional
 public interface ProductService {
@@ -14,7 +15,7 @@ public interface ProductService {
 
     ProductDto get(Long pno);
 
-    void modify(ProductDto productDto);
+    void modify(ProductModifyRequestDto requestDto);
 
     void remove(Long pno);
 }

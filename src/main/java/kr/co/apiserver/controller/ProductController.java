@@ -1,22 +1,20 @@
 package kr.co.apiserver.controller;
 
-import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.ProductDto;
+import kr.co.apiserver.dto.ProductModifyRequestDto;
 import kr.co.apiserver.service.ProductService;
 import kr.co.apiserver.util.CustomFileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestController
 @Log4j2
@@ -44,15 +42,10 @@ public class ProductController {
     public Map<String, Long> register(ProductDto productDto) {
 
         List<MultipartFile> files = productDto.getFiles();
-        log.info("files: " + files);
-        log.info("files.size: " + files.size());
         List<String> uploadFilenames = fileUtil.saveFiles(files);
         productDto.setUploadedFileNames(uploadFilenames);
 
-        log.info(uploadFilenames);
-
         Long pno = productService.register(productDto);
-
         return Map.of("result", pno);
     }
 
@@ -62,32 +55,34 @@ public class ProductController {
     }
 
     @PutMapping("/{pno}")
-    public Map<String, String> modify(@PathVariable Long pno, ProductDto productDto) {
+    public Map<String, String> modify(@PathVariable Long pno, ProductModifyRequestDto requestDto) {
 
-        productDto.setPno(pno);
+        //requestDto.setPno(pno);
 
         // 기존 productDto
-        ProductDto oldProductDto = productService.get(pno);
+        //ProductDto oldProductDto = productService.get(pno);
 
         // 새로 upload된 file
-        List<MultipartFile> files = productDto.getFiles();
+        List<MultipartFile> files = requestDto.getFiles();
         List<String> newUploadFileNames = fileUtil.saveFiles(files);
 
         // 기존 이미지 중 keep 할 file
-        List<String> uploadedFileNames = productDto.getUploadedFileNames();
+        //List<String> uploadedFileNames = requestDto.getUploadedFileNames();
 
         if(newUploadFileNames != null && !newUploadFileNames.isEmpty()) {
-            uploadedFileNames.addAll(newUploadFileNames);
+            requestDto.getUploadedFileNames().addAll(newUploadFileNames);
         }
 
-        productService.modify(productDto);
+        fileUtil.deleteFiles(requestDto.getDeletedFileNames());
 
-        List<String> oldFileNames = oldProductDto.getUploadedFileNames();
-        if(oldFileNames != null && !oldFileNames.isEmpty()) {
-            List<String> removeFileNames = oldFileNames.stream().filter(fileName -> !uploadedFileNames.contains(fileName)).toList();
+        productService.modify(requestDto);
 
-            fileUtil.deleteFiles(removeFileNames);
-        }
+//        List<String> oldFileNames = oldProductDto.getUploadedFileNames();
+//        if(oldFileNames != null && !oldFileNames.isEmpty()) {
+//            List<String> removeFileNames = oldFileNames.stream().filter(fileName -> !uploadedFileNames.contains(fileName)).toList();
+//
+//            fileUtil.deleteFiles(removeFileNames);
+//        }
 
         return Map.of("result", "success");
     }
