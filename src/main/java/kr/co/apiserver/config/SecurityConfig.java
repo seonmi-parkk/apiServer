@@ -33,6 +33,7 @@ public class SecurityConfig {
     private final ApiLoginFailHandler apiLoginFailHandler;
     private final AccessDeniedHandlerImpl accessDeniedHandler;
     private final UserDetailsServiceImpl userDetailsServiceImpl;
+    private final AuthenticationEntryPointImpl authenticationEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {
@@ -62,8 +63,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
-
-                        .requestMatchers("/", "/user/**", "/products/view/**").permitAll() // 메인, 로그인, 회원가입 페이지 접근 허용
+                        .requestMatchers("/", "/user/**", "/products/view/**").permitAll() // 메인, 로그인, 회원가입 페이지 접근 허용 & mvc 예외 핸들링 결과를 Security가 가로채지 않도록
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리
         );
@@ -75,7 +75,7 @@ public class SecurityConfig {
 
         // 예외 처리 설정
         http.exceptionHandling(config -> {
-            config.authenticationEntryPoint(new CustomJwtEntryPoint());
+            config.authenticationEntryPoint(authenticationEntryPoint);
             config.accessDeniedHandler(accessDeniedHandler);
         });
 

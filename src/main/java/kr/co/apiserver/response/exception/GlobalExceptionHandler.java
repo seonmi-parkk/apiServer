@@ -6,10 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.security.sasl.AuthenticationException;
 import java.util.Map;
 
 @Slf4j
@@ -38,9 +40,9 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ErrorCode.FORBIDDEN));
     }
 
-    @ExceptionHandler(JwtException.class)
-    public ResponseEntity<ApiResponse<Void>> handleJwtException(JwtException e) {
-        log.error("JwtException : " + e.getMessage());
+    @ExceptionHandler
+    public ResponseEntity<ApiResponse<Void>> handleAuthenticationException(AuthenticationException e) {
+        log.error("AuthenticationException : " + e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.error(ErrorCode.UNAUTHORIZED));
     }
@@ -48,10 +50,16 @@ public class GlobalExceptionHandler {
     //@Valid - @RequestBody
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ApiResponse<Map<String, String>>> handleMethodValidException(MethodArgumentNotValidException e) {
-        log.error("BindException");
+        log.error("BindException" + e.getMessage());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.validException(e.getBindingResult()));
     }
 
+    @ExceptionHandler({HttpRequestMethodNotSupportedException.class})
+    public ResponseEntity<ApiResponse<Void>> handleMethodNotAllowedException(HttpRequestMethodNotSupportedException e) {
+        log.error("MethodNotAllowedException :" + e.getMessage());
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED));
+    }
 
 }
