@@ -25,7 +25,7 @@ public class CartController {
     @PreAuthorize("#itemDto.email == authentication.name")
     @PostMapping
     public List<CartItemListDto> addItem(@RequestBody CartItemDto itemDto) {
-        log.info(itemDto);
+        log.info("CartItemDto : "+itemDto);
         return cartService.addItem(itemDto);
     }
 
@@ -34,7 +34,6 @@ public class CartController {
     public List<CartItemListDto> getCartItemList(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
         log.info("email: " + email);
-
         return cartService.findCartItems(email);
     }
 
