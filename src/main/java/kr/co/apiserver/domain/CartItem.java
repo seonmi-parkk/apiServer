@@ -15,12 +15,11 @@ public class CartItem {
     private Long cino;
 
     @ManyToOne
-    @JoinColumn(name = "product_pno")
+    @JoinColumn(name = "product_pno", nullable = false)
     private Product product;
 
-    //cascade 고려!!
     @ManyToOne
-    @JoinColumn(name = "cart_cno")
+    @JoinColumn(name = "cart_cno", nullable = false)
     private Cart cart;
 
 }

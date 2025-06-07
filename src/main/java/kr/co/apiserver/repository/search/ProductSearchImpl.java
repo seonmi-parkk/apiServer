@@ -2,6 +2,7 @@ package kr.co.apiserver.repository.search;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import kr.co.apiserver.domain.ProductStatus;
 import kr.co.apiserver.util.QueryDslUtil;
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.domain.QProduct;
@@ -37,7 +38,7 @@ public class ProductSearchImpl implements ProductSearch {
                 .select(product)
                 .from(product)
                 .leftJoin(product.imageList, productImage).fetchJoin()
-                .where(product.deleted.eq(false))
+                .where(product.status.eq(ProductStatus.APPROVED))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(QueryDslUtil.toOrderSpecifier(pageable.getSort(), product))

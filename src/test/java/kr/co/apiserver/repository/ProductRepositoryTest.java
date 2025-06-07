@@ -57,16 +57,6 @@ public class ProductRepositoryTest {
         log.info(product.getImageList());
     }
 
-    @Commit
-    @Transactional
-    @Test
-    public void testDelete() {
-        Long pno = 2L;
-
-        productRepository.updateToDelete(2L, true);
-        log.info("Deleted product with pno: " + pno);
-    }
-
     @Test
     public void testUpdate() {
         Product product = productRepository.selectOne(3L).orElseThrow(NoSuchElementException::new);

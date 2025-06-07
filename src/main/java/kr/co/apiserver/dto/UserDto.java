@@ -35,7 +35,6 @@ public class UserDto extends User {
     public Map<String, Object> getClaims() {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", email);
-        claims.put("password", password);
         claims.put("nickname", nickname);
         claims.put("isSocial", isSocial);
         claims.put("roleNames", roles.stream().map(role -> role.name()).toList());

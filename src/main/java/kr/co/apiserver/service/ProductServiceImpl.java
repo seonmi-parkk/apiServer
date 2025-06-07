@@ -2,6 +2,7 @@ package kr.co.apiserver.service;
 
 import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.Product;
+import kr.co.apiserver.domain.ProductStatus;
 import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.ProductDto;
@@ -91,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
         product.changePrice(requestDto.getPrice());
         product.changeName(requestDto.getPname());
         product.changeDesc(requestDto.getPdesc());
-        product.changeDeleted(requestDto.isDeleted());
+        product.changeStatus(requestDto.getStatus());
 
         // 새로운 이미지 추가
         List<String> uploadFileNames = requestDto.getUploadedFileNames();
@@ -108,6 +109,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void remove(Long pno) {
         Product product = productRepository.findById(pno).orElseThrow();
-        product.changeDeleted(true);
+        product.changeStatus(ProductStatus.DELETED);
     }
 }

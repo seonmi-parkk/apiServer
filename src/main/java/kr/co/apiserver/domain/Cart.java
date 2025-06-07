@@ -19,6 +19,6 @@ public class Cart {
     private Long cno;
 
     @OneToOne
-    @JoinColumn(name = "user_email")
+    @JoinColumn(name = "user_email", nullable = false)
     private User user;
 }

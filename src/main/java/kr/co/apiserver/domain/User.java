@@ -16,13 +16,17 @@ public class User {
     @Id
     private String email;
 
+    @Column(nullable = false)
     private String password;
+
     private String nickname;
+
     private boolean isSocial;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @Builder.Default
     @Enumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(nullable = false)
     private List<UserRole> userRoleList = new ArrayList<>();
 
     public void addRole(UserRole userRole) {

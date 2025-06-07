@@ -2,6 +2,7 @@ package kr.co.apiserver.dto;
 
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.domain.ProductImage;
+import kr.co.apiserver.domain.ProductStatus;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,7 +20,7 @@ public class ProductDto {
     private String pname;
     private int price;
     private String pdesc;
-    private boolean deleted;
+    private ProductStatus status;
 
     public static ProductDto fromEntity(Product product) {
         return ProductDto.builder()
@@ -27,7 +28,7 @@ public class ProductDto {
                 .pname(product.getPname())
                 .price(product.getPrice())
                 .pdesc(product.getPdesc())
-                .deleted(product.isDeleted())
+                .status(product.getStatus())
                 .uploadedFileNames(product.getImageList().stream()
                         .map(ProductImage::getFileName)
                         .toList())

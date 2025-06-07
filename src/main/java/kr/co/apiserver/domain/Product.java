@@ -20,13 +20,24 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pno;
 
+    @Column(nullable = false)
     private String pname;
+
+    @Column(nullable = false)
     private int price;
+
     private String pdesc;
-    private boolean deleted;
+    // private boolean deleted;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ProductStatus status = ProductStatus.PENDING;
+
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("ord asc")
+    @Column(nullable = false)
     @Builder.Default
     private List<ProductImage> imageList = new ArrayList<>();
 
@@ -36,7 +47,7 @@ public class Product {
                 .pname(productDto.getPname())
                 .price(productDto.getPrice())
                 .pdesc(productDto.getPdesc())
-                .deleted(productDto.isDeleted())
+                .status(productDto.getStatus())
                 .build();
 
         List<String> uploadedFileNames = productDto.getUploadedFileNames();
@@ -70,8 +81,12 @@ public class Product {
         this.pname = name;
     }
 
-    public void changeDeleted(boolean deleted) {
-        this.deleted = deleted;
+//    public void changeDeleted(boolean deleted) {
+//        this.deleted = deleted;
+//    }
+
+    public void changeStatus(ProductStatus status) {
+        this.status = status;
     }
 
     public void addImage(ProductImage image) {
