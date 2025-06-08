@@ -1,5 +1,6 @@
 package kr.co.apiserver.controller;
 
+import kr.co.apiserver.domain.ProductStatus;
 import kr.co.apiserver.dto.PageRequestDto;
 import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.ProductDto;
@@ -42,13 +43,14 @@ public class ProductController {
 
     @PostMapping("/")
     public Map<String, Long> register(ProductDto productDto) {
-
+        // 파일 업로드 처리
         List<MultipartFile> files = productDto.getFiles();
         List<String> uploadFilenames = fileUtil.saveFiles(files);
         productDto.setUploadedFileNames(uploadFilenames);
 
+        productDto.setStatus(ProductStatus.PENDING);
         Long pno = productService.register(productDto);
-        return Map.of("result", pno);
+        return  Map.of("result", pno);
     }
 
     @GetMapping("/{pno}")
