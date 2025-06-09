@@ -32,57 +32,66 @@ public class CustomFileUtil {
 
     @PostConstruct // 초기화 메서드
     public void init() {
-        File tempFolder = new File(uploadPath);
-        if(!tempFolder.exists()) {
-            tempFolder.mkdir();
-        }
+        List<String> categories = List.of("profile", "product", "product/thumb", "banner");
 
-        uploadPath = tempFolder.getAbsolutePath();
-        log.info("uploadPath: " + uploadPath);
+        for (String category : categories) {
+            File categoryFolder = new File(uploadPath, category);
+            if (!categoryFolder.exists()) {
+                categoryFolder.mkdirs();
+                log.info("Created folder: " + categoryFolder.getAbsolutePath() );
+            }
+        }
     }
 
-    public List<String> saveFiles(List<MultipartFile> files){
+    public List<String> saveFiles(List<MultipartFile> files, String category){
 
         if(files == null || files.isEmpty()) {
             return List.of();
         }
 
-        List<String> uploadNames = new ArrayList<>();
-        for(MultipartFile file : files) {
+        Path categoryDir = Paths.get(uploadPath, category);
+        // 썸네일 폴더 경로
+        Path thumbDir = categoryDir.resolve("thumb");
 
-            if(file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
+        List<String> uploadNames = new ArrayList<>();
+        for (MultipartFile file : files) {
+            if (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
                 continue;
             }
 
-            String savedName = UUID.randomUUID().toString()+ "_" + file.getOriginalFilename();
-            Path savePath = Paths.get(uploadPath, savedName);
+            String savedName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path savePath = Paths.get(categoryDir.toString(), savedName);
 
             try {
-                Files.copy(file.getInputStream(), savePath); // 원본파일 업로드
+                Files.copy(file.getInputStream(), savePath);  // 원본파일 업로드
 
                 String contentType = file.getContentType(); // 파일의 MIME 타입
                 if (contentType != null && contentType.startsWith("image")) {
                     // 이미지 파일인 경우 썸네일 생성
-                    Path thumbnailPath = Paths.get(uploadPath, "s_"+ savedName);
+                    Path thumbnailPath = thumbDir.resolve("s_" + savedName);
 
-                    Thumbnails.of(savePath.toFile()).size(200, 200)
+                    Thumbnails.of(savePath.toFile())
+                            .size(200, 200)
                             .toFile(thumbnailPath.toFile());
                 }
 
+                // DB에 저장할 경로
                 uploadNames.add(savedName);
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+
         return uploadNames;
     }
 
     public ResponseEntity<Resource> getFile(String fileName) {
-
-        Resource resource = new FileSystemResource(uploadPath + File.separator + fileName);
+        Path path = Paths.get(uploadPath, fileName);
+        Resource resource = new FileSystemResource(path);
 
         if(!resource.isReadable()) {
-            resource = new FileSystemResource(uploadPath + File.separator + "default.png");
+            resource = new FileSystemResource(Paths.get( uploadPath,"default.png"));
         }
 
         HttpHeaders headers = new HttpHeaders();

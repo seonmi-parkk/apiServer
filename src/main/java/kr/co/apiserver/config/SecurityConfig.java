@@ -64,7 +64,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
-                        .requestMatchers("/", "/user/**","/products/view/**").permitAll() // 메인, 로그인, 회원가입 페이지 접근 허용
+                        .requestMatchers("/", "/user/**","/products/view/**", "/upload/**").permitAll() // 메인, 로그인, 회원가입 페이지, 이미지 접근 허용
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리

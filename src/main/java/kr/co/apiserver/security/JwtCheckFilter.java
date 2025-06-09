@@ -44,6 +44,7 @@ public class JwtCheckFilter extends OncePerRequestFilter {
         if( path.startsWith("/user/login")
             || path.startsWith("/user/auth/kakao")
             || path.startsWith("/user/refresh")
+            || path.startsWith("/upload/")
             || path.startsWith("/products/view/")
             || path.startsWith("/products/") && method.equals("GET")
         ) {
