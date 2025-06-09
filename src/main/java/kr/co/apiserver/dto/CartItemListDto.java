@@ -1,6 +1,6 @@
 package kr.co.apiserver.dto;
 
-import kr.co.apiserver.domain.ProductStatus;
+import kr.co.apiserver.domain.emums.ProductStatus;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
