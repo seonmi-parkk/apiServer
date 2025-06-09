@@ -1,6 +1,6 @@
 package kr.co.apiserver.dto;
 
-import kr.co.apiserver.domain.ProductStatus;
+import kr.co.apiserver.domain.emums.ProductStatus;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +17,7 @@ public class ProductModifyRequestDto {
     private String pname;
     private int price;
     private String pdesc;
-    private ProductStatus status;
+    private ProductStatus status = ProductStatus.APPROVED;
 
     private List<MultipartFile> files = new ArrayList<>(); // 파일 업로드시
 

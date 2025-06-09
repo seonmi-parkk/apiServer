@@ -1,18 +1,16 @@
 package kr.co.apiserver.controller;
 
-import kr.co.apiserver.domain.ProductStatus;
-import kr.co.apiserver.dto.PageRequestDto;
-import kr.co.apiserver.dto.PageResponseDto;
-import kr.co.apiserver.dto.ProductDto;
-import kr.co.apiserver.dto.ProductModifyRequestDto;
-import kr.co.apiserver.response.exception.CustomException;
-import kr.co.apiserver.response.exception.ErrorCode;
+import kr.co.apiserver.domain.emums.ProductStatus;
+import kr.co.apiserver.dto.*;
+import kr.co.apiserver.response.ApiResponse;
+import kr.co.apiserver.security.UserDetailsImpl;
 import kr.co.apiserver.service.ProductService;
 import kr.co.apiserver.util.CustomFileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,29 +35,32 @@ public class ProductController {
 
     //@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/list")
-    public PageResponseDto<ProductDto> productList(PageRequestDto pageRequestDto) {
-        return productService.getList(pageRequestDto);
+    public ApiResponse<PageResponseDto<ProductListResponseDto>> productList(PageRequestDto pageRequestDto) {
+        return ApiResponse.ok(productService.getList(pageRequestDto));
     }
 
     @PostMapping("/")
-    public Map<String, Long> register(ProductDto productDto) {
+    public ApiResponse<Map<String, Long>> register(@AuthenticationPrincipal UserDetailsImpl userDetails, ProductDto productDto) {
         // 파일 업로드 처리
         List<MultipartFile> files = productDto.getFiles();
-        List<String> uploadFilenames = fileUtil.saveFiles(files);
+        List<String> uploadFilenames = fileUtil.saveFiles(files,"product");
+        log.info("uploadFilenames!!!!!: " + uploadFilenames);
         productDto.setUploadedFileNames(uploadFilenames);
 
         productDto.setStatus(ProductStatus.PENDING);
+        log.info("userDetails.getUser()) :" + userDetails.getUser());
+        productDto.setSeller(userDetails.getUser());
         Long pno = productService.register(productDto);
-        return  Map.of("result", pno);
+        return ApiResponse.ok(Map.of("result", pno));
     }
 
     @GetMapping("/{pno}")
-    public ProductDto read(@PathVariable("pno") Long pno) {
-        return productService.get(pno);
+    public ApiResponse<ProductResponseDto> read(@PathVariable("pno") Long pno) {
+        return ApiResponse.ok(productService.get(pno));
     }
 
     @PutMapping("/{pno}")
-    public Map<String, String> modify(@PathVariable Long pno, ProductModifyRequestDto requestDto) {
+    public ApiResponse<Map<String, String>> modify(@PathVariable Long pno, ProductModifyRequestDto requestDto) {
 
         //requestDto.setPno(pno);
 
@@ -68,7 +69,7 @@ public class ProductController {
 
         // 새로 upload된 file
         List<MultipartFile> files = requestDto.getFiles();
-        List<String> newUploadFileNames = fileUtil.saveFiles(files);
+        List<String> newUploadFileNames = fileUtil.saveFiles(files,"product");
 
         // 기존 이미지 중 keep 할 file
         //List<String> uploadedFileNames = requestDto.getUploadedFileNames();
@@ -88,11 +89,11 @@ public class ProductController {
 //            fileUtil.deleteFiles(removeFileNames);
 //        }
 
-        return Map.of("result", "success");
+        return ApiResponse.ok(null);
     }
 
     @PatchMapping("/{pno}")
-    public Map<String, String> remove(@PathVariable Long pno) {
+    public ApiResponse<Map<String, String>> remove(@PathVariable Long pno) {
         log.info("remove pno: " + pno);
         List<String> oldFileNames = productService.get(pno).getUploadedFileNames();
 
@@ -100,6 +101,6 @@ public class ProductController {
 
         fileUtil.deleteFiles(oldFileNames);
 
-        return Map.of("result", "success");
+        return ApiResponse.ok(null);
     }
 }

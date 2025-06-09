@@ -2,11 +2,8 @@ package kr.co.apiserver.service;
 
 import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.Product;
-import kr.co.apiserver.domain.ProductStatus;
-import kr.co.apiserver.dto.PageRequestDto;
-import kr.co.apiserver.dto.PageResponseDto;
-import kr.co.apiserver.dto.ProductDto;
-import kr.co.apiserver.dto.ProductModifyRequestDto;
+import kr.co.apiserver.domain.emums.ProductStatus;
+import kr.co.apiserver.dto.*;
 import kr.co.apiserver.repository.ProductImageRepository;
 import kr.co.apiserver.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,11 +23,11 @@ public class ProductServiceImpl implements ProductService {
     private final ProductImageRepository productImageRepository;
 
     @Override
-    public PageResponseDto<ProductDto> getList(PageRequestDto pageRequestDto) {
+    public PageResponseDto<ProductListResponseDto> getList(PageRequestDto pageRequestDto) {
         log.info("getPage : "+pageRequestDto.getPage());
         log.info("getSize : "+pageRequestDto.getSize());
         // JPA
-        Page<ProductDto> dtoList  = productRepository.searchList(pageRequestDto, pageRequestDto.toPageable());
+        Page<ProductListResponseDto> dtoList  = productRepository.searchList(pageRequestDto, pageRequestDto.toPageable());
 
         return new PageResponseDto<>(dtoList);
 //        Pageable pageable = PageRequest.of(
@@ -67,14 +64,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDto get(Long pno) {
+    public ProductResponseDto get(Long pno) {
         Optional<Product> result = productRepository.findByIdWithImages(pno);
 
         Product product = result.orElseThrow();
 
         log.info("==============product{} // imageList{} : ",product, product.getImageList());
 
-        return ProductDto.fromEntity(product);
+        return ProductResponseDto.fromEntity(product);
     }
 
     @Transactional
