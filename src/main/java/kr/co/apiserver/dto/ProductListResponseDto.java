@@ -15,33 +15,25 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDto {
+public class ProductListResponseDto {
 
     private Long pno;
-    private User seller;
+    private String sellerEmail;
     private String pname;
     private int price;
-    private String pdesc;
-    private ProductStatus status;
 
-    public static ProductDto fromEntity(Product product) {
-        return ProductDto.builder()
+    public static ProductListResponseDto fromEntity(Product product) {
+        return ProductListResponseDto.builder()
                 .pno(product.getPno())
-                .seller(product.getSeller())
+                .sellerEmail(product.getSeller().getEmail())
                 .pname(product.getPname())
                 .price(product.getPrice())
-                .pdesc(product.getPdesc())
-                .status(product.getStatus())
                 .uploadedFileNames(product.getImageList().stream()
                         .map(ProductImage::getFileName)
                         .toList())
                 .build();
     }
 
-    @Builder.Default
-    private List<MultipartFile> files = new ArrayList<>(); // 파일 업로드시
-
-    @Builder.Default
     private List<String> uploadedFileNames = new ArrayList<>(); // 파일 조회시
 
 }

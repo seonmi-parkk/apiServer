@@ -1,6 +1,7 @@
 package kr.co.apiserver.domain;
 
 import jakarta.persistence.*;
+import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.ProductDto;
 import lombok.*;
 
@@ -13,12 +14,16 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString(exclude = "imageList") // 테스트할때 편하기 위해서 연관관계있는 애들은 제외
+@ToString(exclude = {"imageList", "seller"})
 public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pno;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_email", nullable = false)
+    private User seller;
 
     @Column(nullable = false)
     private String pname;
@@ -44,6 +49,7 @@ public class Product {
     public static Product createProduct(ProductDto productDto) {
         Product product = Product.builder()
                 .pno(productDto.getPno())
+                .seller(productDto.getSeller())
                 .pname(productDto.getPname())
                 .price(productDto.getPrice())
                 .pdesc(productDto.getPdesc())

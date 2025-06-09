@@ -15,33 +15,39 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDto {
+public class ProductResponseDto {
 
     private Long pno;
-    private User seller;
+    private String sellerEmail;
+    private String sellerNickname;
+    private String sellerImage;
     private String pname;
     private int price;
     private String pdesc;
-    private ProductStatus status;
+    private String status;
+    private String statusName;
 
-    public static ProductDto fromEntity(Product product) {
-        return ProductDto.builder()
+    public static ProductResponseDto fromEntity(Product product) {
+        return ProductResponseDto.builder()
                 .pno(product.getPno())
-                .seller(product.getSeller())
+                .sellerEmail(product.getSeller().getEmail())
+                .sellerNickname(product.getSeller().getNickname())
+                .sellerImage(
+                    product.getSeller().getProfileImage() != null ?
+                    product.getSeller().getProfileImage() :
+                    "profile/default-profile.png"
+                )
                 .pname(product.getPname())
                 .price(product.getPrice())
                 .pdesc(product.getPdesc())
-                .status(product.getStatus())
+                .status(product.getStatus().name())
+                .statusName(product.getStatus().getMessage())
                 .uploadedFileNames(product.getImageList().stream()
                         .map(ProductImage::getFileName)
                         .toList())
                 .build();
     }
 
-    @Builder.Default
-    private List<MultipartFile> files = new ArrayList<>(); // 파일 업로드시
-
-    @Builder.Default
-    private List<String> uploadedFileNames = new ArrayList<>(); // 파일 조회시
+    private List<String> uploadedFileNames = new ArrayList<>();
 
 }
