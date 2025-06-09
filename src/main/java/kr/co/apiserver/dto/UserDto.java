@@ -1,6 +1,6 @@
 package kr.co.apiserver.dto;
 
-import kr.co.apiserver.domain.UserRole;
+import kr.co.apiserver.domain.emums.UserRole;
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;

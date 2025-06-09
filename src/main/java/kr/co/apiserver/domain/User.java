@@ -1,6 +1,7 @@
 package kr.co.apiserver.domain;
 
 import jakarta.persistence.*;
+import kr.co.apiserver.domain.emums.UserRole;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ public class User {
     private String password;
 
     private String nickname;
+
+    private String profileImage;
 
     private boolean isSocial;
 
@@ -43,6 +46,10 @@ public class User {
 
     public void changeNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void changeProfile(String profileImage) {
+        this.profileImage = profileImage;
     }
 
     public void changeSocial(boolean isSocial) {

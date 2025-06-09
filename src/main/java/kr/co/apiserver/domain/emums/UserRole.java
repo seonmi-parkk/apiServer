@@ -1,4 +1,4 @@
-package kr.co.apiserver.domain;
+package kr.co.apiserver.domain.emums;
 
 public enum UserRole {
 

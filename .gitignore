@@ -9,6 +9,9 @@ build/
 /src/main/resources/application.properties
 /src/main/resources/application-*.properties
 
+## 이미지
+/upload
+
 ### STS ###
 .apt_generated
 .classpath

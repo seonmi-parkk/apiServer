@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.co.apiserver.domain.UserRole;
-import kr.co.apiserver.dto.UserDto;
 import kr.co.apiserver.service.RedisService;
 import kr.co.apiserver.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Log4j2
 @Component

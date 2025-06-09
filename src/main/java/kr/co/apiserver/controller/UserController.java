@@ -30,7 +30,7 @@ public class UserController {
 
     // access token 재발급
     @PostMapping("/refresh")
-    public Map<String, String> refreshAccessToken(@RequestBody Map<String, String> requestBody) {
+    public ApiResponse<Map<String, String>> refreshAccessToken(@RequestBody Map<String, String> requestBody) {
         String refreshToken = requestBody.get("refreshToken");
         if (refreshToken == null) {
             log.error("refresh token is null");
@@ -39,12 +39,13 @@ public class UserController {
 
         Map<String,String> tokens = userService.refreshAccessToken(refreshToken);
 
-        return tokens;
+        return ApiResponse.ok(tokens);
     }
 
     @PostMapping("/auth/kakao")
-    public Map<String,Object> kakaoCallback(@RequestBody Map<String, String> body) {
-        return userService.loginWithKakao(body.get("authCode"));
+    public ApiResponse<Map<String,Object>> kakaoCallback(@RequestBody Map<String, String> body) {
+        Map<String, Object> result = userService.loginWithKakao(body.get("authCode"));
+        return ApiResponse.ok(result);
     }
 
     @PatchMapping("/modify")

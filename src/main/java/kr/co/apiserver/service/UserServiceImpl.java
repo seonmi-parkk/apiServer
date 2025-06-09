@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.User;
-import kr.co.apiserver.domain.UserRole;
+import kr.co.apiserver.domain.emums.UserRole;
 import kr.co.apiserver.dto.UserDto;
 import kr.co.apiserver.dto.UserModifyRequestDto;
 import kr.co.apiserver.repository.UserRepository;
@@ -25,7 +25,6 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
