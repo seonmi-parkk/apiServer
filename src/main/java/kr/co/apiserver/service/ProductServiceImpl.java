@@ -6,6 +6,8 @@ import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.*;
 import kr.co.apiserver.repository.ProductImageRepository;
 import kr.co.apiserver.repository.ProductRepository;
+import kr.co.apiserver.response.exception.CustomException;
+import kr.co.apiserver.response.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -67,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDto get(Long pno) {
         Optional<Product> result = productRepository.findByIdWithImages(pno);
 
-        Product product = result.orElseThrow();
+        Product product = result.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
         log.info("==============product{} // imageList{} : ",product, product.getImageList());
 
@@ -108,4 +110,19 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(pno).orElseThrow();
         product.changeStatus(ProductStatus.DELETED);
     }
+
+    @Transactional
+    @Override
+    public void changeStatusToPaused(Long pno) {
+        Product product = productRepository.findById(pno).orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        product.changeStatus(ProductStatus.PAUSED);
+    }
+
+    @Transactional
+    @Override
+    public void changeStatusToActivated(Long pno) {
+        Product product = productRepository.findById(pno).orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        product.changeStatus(ProductStatus.APPROVED);
+    }
+
 }

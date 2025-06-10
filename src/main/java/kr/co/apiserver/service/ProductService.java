@@ -15,4 +15,8 @@ public interface ProductService {
     void modify(ProductModifyRequestDto requestDto);
 
     void remove(Long pno);
+
+    void changeStatusToPaused(Long pno);
+
+    void changeStatusToActivated(Long pno);
 }

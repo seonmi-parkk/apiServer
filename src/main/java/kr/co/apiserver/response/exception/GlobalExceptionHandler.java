@@ -62,4 +62,11 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED));
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleAll(Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(ErrorCode.INTERNAL_ERROR));
+    }
+
 }

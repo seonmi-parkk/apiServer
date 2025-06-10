@@ -3,6 +3,8 @@ package kr.co.apiserver.controller;
 import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.*;
 import kr.co.apiserver.response.ApiResponse;
+import kr.co.apiserver.response.exception.CustomException;
+import kr.co.apiserver.response.exception.ErrorCode;
 import kr.co.apiserver.security.UserDetailsImpl;
 import kr.co.apiserver.service.ProductService;
 import kr.co.apiserver.util.CustomFileUtil;
@@ -27,18 +29,20 @@ public class ProductController {
     private final ProductService productService;
 
 
-
+    // 파일 조회
     @GetMapping("/view/{fileName}")
     public ResponseEntity<Resource> viewFileGet(@PathVariable("fileName") String fileName) {
        return fileUtil.getFile(fileName);
     }
 
+    // 상품 목록 조회
     //@PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @GetMapping("/list")
     public ApiResponse<PageResponseDto<ProductListResponseDto>> productList(PageRequestDto pageRequestDto) {
         return ApiResponse.ok(productService.getList(pageRequestDto));
     }
 
+    // 상품 등록
     @PostMapping("/")
     public ApiResponse<Map<String, Long>> register(@AuthenticationPrincipal UserDetailsImpl userDetails, ProductDto productDto) {
         // 파일 업로드 처리
@@ -54,18 +58,22 @@ public class ProductController {
         return ApiResponse.ok(Map.of("result", pno));
     }
 
+    // 상품 상세 조회
     @GetMapping("/{pno}")
     public ApiResponse<ProductResponseDto> read(@PathVariable("pno") Long pno) {
         return ApiResponse.ok(productService.get(pno));
     }
 
+    // 상품 수정
     @PutMapping("/{pno}")
     public ApiResponse<Map<String, String>> modify(@PathVariable Long pno, ProductModifyRequestDto requestDto) {
 
         //requestDto.setPno(pno);
 
-        // 기존 productDto
-        //ProductDto oldProductDto = productService.get(pno);
+        // 승인 완료 된 상품은 수정 불가
+        if(productService.get(pno).getStatus().equals(ProductStatus.PENDING.name())) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
 
         // 새로 upload된 file
         List<MultipartFile> files = requestDto.getFiles();
@@ -92,6 +100,7 @@ public class ProductController {
         return ApiResponse.ok(null);
     }
 
+    // 상품 삭제
     @PatchMapping("/{pno}")
     public ApiResponse<Map<String, String>> remove(@PathVariable Long pno) {
         log.info("remove pno: " + pno);
@@ -101,6 +110,30 @@ public class ProductController {
 
         fileUtil.deleteFiles(oldFileNames);
 
+        return ApiResponse.ok(null);
+    }
+
+    // 상품 판매 중지
+    @PatchMapping("/{pno}/paused")
+    public ApiResponse<Void> changeStatusToPaused(@PathVariable Long pno) {
+        // 판매 중인 경우에만 판매 중지 가능
+        if (!productService.get(pno).getStatus().equals(ProductStatus.APPROVED.name())) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+
+        productService.changeStatusToPaused(pno);
+        return ApiResponse.ok(null);
+    }
+
+    // 상품 판매 재개
+    @PatchMapping("/{pno}/activated")
+    public ApiResponse<Void> changeStatusToActivated(@PathVariable Long pno) {
+        // 판매 중지 상태인 경우에만 판매 재개 가능
+        if (!productService.get(pno).getStatus().equals(ProductStatus.PAUSED.name())) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+
+        productService.changeStatusToActivated(pno);
         return ApiResponse.ok(null);
     }
 }

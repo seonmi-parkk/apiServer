@@ -26,22 +26,21 @@ public class CartController {
     @PreAuthorize("#itemDto.email == authentication.name")
     @PostMapping
     public ApiResponse<List<CartItemListDto>> addItem(@RequestBody CartItemDto itemDto) {
-        log.info("CartItemDto : "+itemDto);
         return ApiResponse.ok(cartService.addItem(itemDto));
     }
 
+    // 장바구니 아이템 조회
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping
     public ApiResponse<List<CartItemListDto>> getCartItemList(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
-        log.info("email: " + email);
         return ApiResponse.ok(cartService.findCartItems(email));
     }
 
+    // 장바구니 아이템 삭제
     @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/{cino}")
     public ApiResponse<List<CartItemListDto>> removeItem(@PathVariable Long cino) {
-        log.info("cino: " + cino);
         return ApiResponse.ok(cartService.removeItem(cino));
     }
 
