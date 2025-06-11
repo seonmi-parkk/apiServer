@@ -10,7 +10,7 @@ public interface ProductService {
 
     Long register(ProductDto productDto);
 
-    ProductResponseDto get(Long pno);
+    ProductResponseDto getProductDetail(Long pno);
 
     void modify(ProductModifyRequestDto requestDto);
 
@@ -19,4 +19,6 @@ public interface ProductService {
     void changeStatusToPaused(Long pno);
 
     void changeStatusToActivated(Long pno);
+
+    ProductDto findById(Long pno);
 }

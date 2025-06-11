@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDto get(Long pno) {
+    public ProductResponseDto getProductDetail(Long pno) {
         Optional<Product> result = productRepository.findByIdWithImages(pno);
 
         Product product = result.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
@@ -114,15 +114,33 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     @Override
     public void changeStatusToPaused(Long pno) {
-        Product product = productRepository.findById(pno).orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = productRepository.findById(pno)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 판매 중인 상품의 경우에만 판매 중지 가능
+        if (!product.getStatus().equals(ProductStatus.APPROVED)) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
         product.changeStatus(ProductStatus.PAUSED);
     }
 
     @Transactional
     @Override
     public void changeStatusToActivated(Long pno) {
-        Product product = productRepository.findById(pno).orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = productRepository.findById(pno)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 판매 중지된 상품의 경우에만 판매 재개 가능
+        if (!product.getStatus().equals(ProductStatus.PAUSED)) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
         product.changeStatus(ProductStatus.APPROVED);
+    }
+
+    @Override
+    public ProductDto findById(Long pno) {
+        Product product = productRepository.findById(pno).orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        return ProductDto.fromEntity(product);
     }
 
 }

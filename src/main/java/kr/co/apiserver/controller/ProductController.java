@@ -48,12 +48,11 @@ public class ProductController {
         // 파일 업로드 처리
         List<MultipartFile> files = productDto.getFiles();
         List<String> uploadFilenames = fileUtil.saveFiles(files,"product");
-        log.info("uploadFilenames!!!!!: " + uploadFilenames);
         productDto.setUploadedFileNames(uploadFilenames);
 
         productDto.setStatus(ProductStatus.PENDING);
-        log.info("userDetails.getUser()) :" + userDetails.getUser());
         productDto.setSeller(userDetails.getUser());
+
         Long pno = productService.register(productDto);
         return ApiResponse.ok(Map.of("result", pno));
     }
@@ -61,17 +60,14 @@ public class ProductController {
     // 상품 상세 조회
     @GetMapping("/{pno}")
     public ApiResponse<ProductResponseDto> read(@PathVariable("pno") Long pno) {
-        return ApiResponse.ok(productService.get(pno));
+        return ApiResponse.ok(productService.getProductDetail(pno));
     }
 
     // 상품 수정
     @PutMapping("/{pno}")
     public ApiResponse<Map<String, String>> modify(@PathVariable Long pno, ProductModifyRequestDto requestDto) {
-
-        //requestDto.setPno(pno);
-
         // 승인 완료 된 상품은 수정 불가
-        if(productService.get(pno).getStatus().equals(ProductStatus.PENDING.name())) {
+        if(!productService.findById(pno).getStatus().equals(ProductStatus.PENDING)) {
             throw new CustomException(ErrorCode.BAD_REQUEST);
         }
 
@@ -103,8 +99,7 @@ public class ProductController {
     // 상품 삭제
     @PatchMapping("/{pno}")
     public ApiResponse<Map<String, String>> remove(@PathVariable Long pno) {
-        log.info("remove pno: " + pno);
-        List<String> oldFileNames = productService.get(pno).getUploadedFileNames();
+        List<String> oldFileNames = productService.getProductDetail(pno).getUploadedFileNames();
 
         productService.remove(pno);
 
@@ -116,11 +111,6 @@ public class ProductController {
     // 상품 판매 중지
     @PatchMapping("/{pno}/paused")
     public ApiResponse<Void> changeStatusToPaused(@PathVariable Long pno) {
-        // 판매 중인 경우에만 판매 중지 가능
-        if (!productService.get(pno).getStatus().equals(ProductStatus.APPROVED.name())) {
-            throw new CustomException(ErrorCode.BAD_REQUEST);
-        }
-
         productService.changeStatusToPaused(pno);
         return ApiResponse.ok(null);
     }
@@ -128,11 +118,6 @@ public class ProductController {
     // 상품 판매 재개
     @PatchMapping("/{pno}/activated")
     public ApiResponse<Void> changeStatusToActivated(@PathVariable Long pno) {
-        // 판매 중지 상태인 경우에만 판매 재개 가능
-        if (!productService.get(pno).getStatus().equals(ProductStatus.PAUSED.name())) {
-            throw new CustomException(ErrorCode.BAD_REQUEST);
-        }
-
         productService.changeStatusToActivated(pno);
         return ApiResponse.ok(null);
     }

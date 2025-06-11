@@ -4,6 +4,7 @@ import kr.co.apiserver.domain.Cart;
 import kr.co.apiserver.domain.CartItem;
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.domain.User;
+import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.CartItemDto;
 import kr.co.apiserver.dto.CartItemListDto;
 import kr.co.apiserver.repository.CartItemRepository;
@@ -33,7 +34,14 @@ public class CartServiceImpl implements CartService {
         String email = cartItemDto.getEmail();
         Long pno = cartItemDto.getPno();
 
-        CartItem cartItem = null;
+
+
+        // 해당 상품이 판매중인 경우에만 장바구니에 추가
+        Product product = productRepository.findById(pno)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        if (product.getStatus() != ProductStatus.APPROVED) {
+            throw new CustomException(ErrorCode.PURCHASE_NOT_AVAILABLE);
+        }
 
         // 이미 장바구니에 해당 아이템이 있는 경우 예외 처리
         Optional<CartItem> optionalCartItem = cartItemRepository.findCartItemByEmailAndPno(email, pno);
@@ -41,11 +49,11 @@ public class CartServiceImpl implements CartService {
             throw new CustomException(ErrorCode.CART_DUPLICATE_ITEM);
         });
 
+        // 해당 email의 장바구니 조회 -> 없으면 생성
         Cart cart = findCart(email);
 
         // 장바구니 아이템 생성
-        Product product = productRepository.findById(pno).orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
-        cartItem = CartItem.builder()
+        CartItem cartItem = CartItem.builder()
                 .cart(cart)
                 .product(product)
                 .build();
@@ -59,9 +67,9 @@ public class CartServiceImpl implements CartService {
 
     private Cart findCart(String email) {
 
-        Cart cart = null;
         // 해당 email의 장바구니 조회
         Optional<Cart> OptionalCart = cartRepository.findByUser_Email(email);
+        Cart cart;
 
         // 없으면 생성
         if (OptionalCart.isEmpty()) {
