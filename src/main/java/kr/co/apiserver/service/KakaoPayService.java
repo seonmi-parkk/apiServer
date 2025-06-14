@@ -1,6 +1,6 @@
 package kr.co.apiserver.service;
 
-import kr.co.apiserver.domain.Order;
+import kr.co.apiserver.domain.Orders;
 import kr.co.apiserver.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,22 +27,22 @@ public class KakaoPayService implements PaymentService {
     private String frontendBaseUrl;
 
     @Override
-    public String requestPayment(Order order){
+    public String requestPayment(Orders orders){
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("Authoriztion", "KakaoAK " + kakaoAdminKey);
+        headers.set("Authorization", "KakaoAK " + kakaoAdminKey);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("cid", "TC0ONETIME");
-        params.add("partner_order_id", order.getOno().toString());
-        params.add("partner_user_id", order.getUser().getEmail());
+        params.add("partner_order_id", orders.getOno().toString());
+        params.add("partner_user_id", orders.getUser().getEmail());
         params.add("item_name", "디지털 아트 구매");
         params.add("quantity", "1");
-        params.add("total_amount", String.valueOf(order.getTotalPrice()));
+        params.add("total_amount", String.valueOf(orders.getTotalPrice()));
         params.add("tax_free_amount", "0");
-        params.add("approval_url", frontendBaseUrl + "/payment/success?orderId=" + order.getOno());
+        params.add("approval_url", frontendBaseUrl + "/payment/success?orderId=" + orders.getOno());
         params.add("cancel_url", frontendBaseUrl + "/payment/cancel");
         params.add("fail_url", frontendBaseUrl + "/payment/fail");
 
@@ -56,8 +56,8 @@ public class KakaoPayService implements PaymentService {
         String tid = (String) response.getBody().get("tid");
         String redirectUrl = (String) response.getBody().get("next_redirect_pc_url");
 
-        order.setTid(tid);
-        orderRepository.save(order);
+        orders.setTid(tid);
+        orderRepository.save(orders);
 
         return redirectUrl;
     }

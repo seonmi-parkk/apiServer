@@ -1,5 +1,6 @@
 package kr.co.apiserver.controller;
 
+import kr.co.apiserver.domain.ProductImage;
 import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.*;
 import kr.co.apiserver.response.ApiResponse;
@@ -18,6 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RestController
 @Log4j2
@@ -65,26 +69,8 @@ public class ProductController {
 
     // 상품 수정
     @PutMapping("/{pno}")
-    public ApiResponse<Map<String, String>> modify(@PathVariable Long pno, ProductModifyRequestDto requestDto) {
-        // 승인 완료 된 상품은 수정 불가
-        if(!productService.findById(pno).getStatus().equals(ProductStatus.PENDING)) {
-            throw new CustomException(ErrorCode.BAD_REQUEST);
-        }
-
-        // 새로 upload된 file
-        List<MultipartFile> files = requestDto.getFiles();
-        List<String> newUploadFileNames = fileUtil.saveFiles(files,"product");
-
-        // 기존 이미지 중 keep 할 file
-        //List<String> uploadedFileNames = requestDto.getUploadedFileNames();
-
-        if(newUploadFileNames != null && !newUploadFileNames.isEmpty()) {
-            requestDto.getUploadedFileNames().addAll(newUploadFileNames);
-        }
-
-        fileUtil.deleteFiles(requestDto.getDeletedFileNames());
-
-        productService.modify(requestDto);
+    public ApiResponse<Map<String, String>> modify(@PathVariable Long pno, ProductModifyRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        productService.modify(pno, requestDto, userDetails.getUsername());
 
 //        List<String> oldFileNames = oldProductDto.getUploadedFileNames();
 //        if(oldFileNames != null && !oldFileNames.isEmpty()) {
@@ -95,6 +81,45 @@ public class ProductController {
 
         return ApiResponse.ok(null);
     }
+// 상품 수정
+//    @PutMapping("/{pno}")
+//    public ApiResponse<Map<String, String>> modify(@PathVariable Long pno, ProductModifyRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        // 승인 완료 된 상품은 수정 불가
+//        ProductDto productDto = productService.findById(pno);
+//        if(!productDto.getStatus().equals(ProductStatus.PENDING)) {
+//            throw new CustomException(ErrorCode.BAD_REQUEST);
+//        }
+//
+//        // 작성자만 수정 가능
+//        if(!productDto.getSeller().getEmail().equals(userDetails.getUser().getEmail())) {
+//            log.info("작성자: {}, 요청자: {}", productDto.getSeller().getEmail(), userDetails.getUsername());
+//            throw new CustomException(ErrorCode.FORBIDDEN);
+//        }
+//
+//        // 새로 upload된 file 처리
+//        List<MultipartFile> files = requestDto.getFiles();
+//        List<String> newUploadFileNames = fileUtil.saveFiles(files,"product");
+//
+//        // 기존 이미지 중 keep 할 file
+//        //List<String> uploadedFileNames = requestDto.getUploadedFileNames();
+//
+//        if(newUploadFileNames != null && !newUploadFileNames.isEmpty()) {
+//            requestDto.getFileNames().addAll(newUploadFileNames);
+//        }
+//
+//        fileUtil.deleteFiles(requestDto.getDeletedFileNames());
+//
+//        productService.modify(requestDto);
+//
+////        List<String> oldFileNames = oldProductDto.getUploadedFileNames();
+////        if(oldFileNames != null && !oldFileNames.isEmpty()) {
+////            List<String> removeFileNames = oldFileNames.stream().filter(fileName -> !uploadedFileNames.contains(fileName)).toList();
+////
+////            fileUtil.deleteFiles(removeFileNames);
+////        }
+//
+//        return ApiResponse.ok(null);
+//    }
 
     // 상품 삭제
     @PatchMapping("/{pno}")

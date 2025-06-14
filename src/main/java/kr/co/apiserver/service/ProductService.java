@@ -1,6 +1,7 @@
 package kr.co.apiserver.service;
 
 import jakarta.transaction.Transactional;
+import kr.co.apiserver.domain.User;
 import kr.co.apiserver.dto.*;
 
 @Transactional
@@ -12,7 +13,7 @@ public interface ProductService {
 
     ProductResponseDto getProductDetail(Long pno);
 
-    void modify(ProductModifyRequestDto requestDto);
+    void modify(Long pno, ProductModifyRequestDto requestDto, String userEmail);
 
     void remove(Long pno);
 
@@ -20,5 +21,4 @@ public interface ProductService {
 
     void changeStatusToActivated(Long pno);
 
-    ProductDto findById(Long pno);
 }

@@ -1,8 +1,6 @@
 package kr.co.apiserver.controller;
 
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import kr.co.apiserver.dto.UserDto;
 import kr.co.apiserver.dto.UserModifyRequestDto;
 import kr.co.apiserver.response.ApiResponse;
 import kr.co.apiserver.response.exception.CustomException;
@@ -10,10 +8,8 @@ import kr.co.apiserver.response.exception.ErrorCode;
 import kr.co.apiserver.security.UserDetailsImpl;
 import kr.co.apiserver.service.RedisService;
 import kr.co.apiserver.service.UserService;
-import kr.co.apiserver.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

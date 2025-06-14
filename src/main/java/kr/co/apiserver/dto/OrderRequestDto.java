@@ -8,6 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class OrderRequestDto {
-    private List<Long> productIds;
+    private List<Long> productNos;
     private String paymentMethod;
 }

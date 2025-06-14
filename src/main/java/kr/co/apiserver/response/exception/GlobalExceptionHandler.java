@@ -1,6 +1,5 @@
 package kr.co.apiserver.response.exception;
 
-import io.jsonwebtoken.JwtException;
 import kr.co.apiserver.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

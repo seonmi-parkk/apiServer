@@ -14,11 +14,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderItem {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Order order;
+    @JoinColumn(name = "order_ono", nullable = false)
+    private Orders order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Product product;

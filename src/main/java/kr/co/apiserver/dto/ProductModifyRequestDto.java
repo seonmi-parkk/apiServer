@@ -17,12 +17,6 @@ public class ProductModifyRequestDto {
     private String pname;
     private int price;
     private String pdesc;
-    private ProductStatus status = ProductStatus.APPROVED;
-
-    private List<MultipartFile> files = new ArrayList<>(); // 파일 업로드시
-
-    private List<String> uploadedFileNames = new ArrayList<>();
-
-    private List<String> deletedFileNames = new ArrayList<>();
+    List<ImageModifyRequestDto> images = new ArrayList<>();
 
 }

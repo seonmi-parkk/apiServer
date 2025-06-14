@@ -43,46 +43,56 @@ public class CustomFileUtil {
         }
     }
 
-    public List<String> saveFiles(List<MultipartFile> files, String category){
+    public String saveFile(MultipartFile file, String category){
 
-        if(files == null || files.isEmpty()) {
-            return List.of();
+        if(file == null || file.isEmpty()) {
+            return "";
         }
 
         Path categoryDir = Paths.get(uploadPath, category);
         // 썸네일 폴더 경로
         Path thumbDir = categoryDir.resolve("thumb");
 
+        if (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
+            return "";
+        }
+
+        String savedName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        Path savePath = Paths.get(categoryDir.toString(), savedName);
+
+        try {
+            Files.copy(file.getInputStream(), savePath);  // 원본파일 업로드
+
+            String contentType = file.getContentType(); // 파일의 MIME 타입
+            if (contentType != null && contentType.startsWith("image")) {
+                // 이미지 파일인 경우 썸네일 생성
+                Path thumbnailPath = thumbDir.resolve("s_" + savedName);
+
+                Thumbnails.of(savePath.toFile())
+                        .size(200, 200)
+                        .toFile(thumbnailPath.toFile());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return savedName;
+    }
+
+    public List<String> saveFiles(List<MultipartFile> files, String category){
+
+        if(files == null || files.isEmpty()) {
+            return List.of();
+        }
+
         List<String> uploadNames = new ArrayList<>();
         for (MultipartFile file : files) {
             if (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty()) {
                 continue;
             }
-
-            String savedName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-            Path savePath = Paths.get(categoryDir.toString(), savedName);
-
-            try {
-                Files.copy(file.getInputStream(), savePath);  // 원본파일 업로드
-
-                String contentType = file.getContentType(); // 파일의 MIME 타입
-                if (contentType != null && contentType.startsWith("image")) {
-                    // 이미지 파일인 경우 썸네일 생성
-                    Path thumbnailPath = thumbDir.resolve("s_" + savedName);
-
-                    Thumbnails.of(savePath.toFile())
-                            .size(200, 200)
-                            .toFile(thumbnailPath.toFile());
-                }
-
-                // DB에 저장할 경로
-                uploadNames.add(savedName);
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            // DB에 저장할 경로
+            uploadNames.add(saveFile(file, category));
         }
-
         return uploadNames;
     }
 

@@ -110,6 +110,11 @@ public class Product {
         addImage(productImage);
     }
 
+    public void removeImage(ProductImage image) {
+        this.imageList.remove(image);
+        image.setProduct(null); // 연관관계 끊기
+    }
+
 //    public void clearList() {
 //        this.imageList.clear();
 //    }

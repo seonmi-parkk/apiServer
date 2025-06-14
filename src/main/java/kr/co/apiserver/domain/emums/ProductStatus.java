@@ -1,5 +1,8 @@
 package kr.co.apiserver.domain.emums;
 
+import lombok.Getter;
+
+@Getter
 public enum ProductStatus {
     PENDING("승인 대기"),
     APPROVED("판매 중"), // 승인완료
@@ -12,9 +15,4 @@ public enum ProductStatus {
     ProductStatus(String message) {
         this.message = message;
     }
-
-    public String getMessage() {
-        return message;
-    }
-
 }
