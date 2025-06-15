@@ -3,10 +3,8 @@ package kr.co.apiserver.service;
 import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.domain.ProductImage;
-import kr.co.apiserver.domain.User;
 import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.*;
-import kr.co.apiserver.repository.ProductImageRepository;
 import kr.co.apiserver.repository.ProductRepository;
 import kr.co.apiserver.response.exception.CustomException;
 import kr.co.apiserver.response.exception.ErrorCode;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,7 +25,6 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final ProductImageRepository productImageRepository;
     private final CustomFileUtil fileUtil;
 
     @Override

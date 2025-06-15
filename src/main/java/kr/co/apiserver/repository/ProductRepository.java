@@ -1,15 +1,10 @@
 package kr.co.apiserver.repository;
 
 import kr.co.apiserver.domain.Product;
-import kr.co.apiserver.dto.CartItemListDto;
 import kr.co.apiserver.dto.OrderPreviewResponseDto;
-import kr.co.apiserver.dto.ProductDto;
 import kr.co.apiserver.repository.search.ProductSearch;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
