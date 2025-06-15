@@ -6,6 +6,7 @@ import kr.co.apiserver.domain.User;
 import kr.co.apiserver.domain.emums.OrderStatus;
 import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.CartItemListDto;
+import kr.co.apiserver.dto.OrderPreviewResponseDto;
 import kr.co.apiserver.dto.OrderRequestDto;
 import kr.co.apiserver.repository.OrderRepository;
 import kr.co.apiserver.repository.ProductRepository;
@@ -50,10 +51,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<CartItemListDto> previewOrder(OrderRequestDto dto) {
+    public List<OrderPreviewResponseDto> previewOrder(OrderRequestDto dto) {
         // 상품 정보 조회
-        productRepository.getOrderPrivewInfo(dto.getProductNos())
+        return productRepository.getOrderPrivewInfo(dto.getProductNos())
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
-        return null;
     }
 }

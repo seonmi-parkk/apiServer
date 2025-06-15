@@ -8,5 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 public class ImageModifyRequestDto {
     private String fileName;
+    private boolean isNew;
     private MultipartFile file;
 }

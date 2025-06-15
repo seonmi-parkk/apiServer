@@ -2,6 +2,7 @@ package kr.co.apiserver.repository;
 
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.dto.CartItemListDto;
+import kr.co.apiserver.dto.OrderPreviewResponseDto;
 import kr.co.apiserver.dto.ProductDto;
 import kr.co.apiserver.repository.search.ProductSearch;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
     @Query("select " +
             "new kr.co.apiserver.dto.OrderPreviewResponseDto(p.pno, p.pname, p.price, pi.fileName)" +
              "from Product p inner join ProductImage pi on p.pno = pi.product.pno " +
-            "where p.pno in :productsNos")
-    Optional<CartItemListDto> getOrderPrivewInfo(List<Long> productNos);
+             " and pi.ord= 0 " +
+            "where p.pno in :pnos")
+    Optional<List<OrderPreviewResponseDto>> getOrderPrivewInfo(@Param("pnos") List<Long> productsNos);
 }
