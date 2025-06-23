@@ -33,10 +33,15 @@ public class Orders {
 
     private LocalDateTime paidAt;
 
-    private String tid;
+    private String tid; // 카카오 결제 TID
+    private String redirectUrl; // 결제 페이지 URL
+
+    @Column(unique = true)
+    private String idempotencyKey;
 
     @Column(nullable = false)
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
 
     public void addItem(Product product) {

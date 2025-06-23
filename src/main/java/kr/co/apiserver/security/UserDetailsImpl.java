@@ -48,6 +48,8 @@ public class UserDetailsImpl implements UserDetails {
         userInfo.put("roleNames", user.getUserRoleList().stream()
                 .map(Enum::name)
                 .collect(Collectors.joining(",")));
+        userInfo.put("profileImage", user.getProfileImage() != null ?
+                user.getProfileImage() : "profile/default-profile.png");
         return userInfo;
     }
 }

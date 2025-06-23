@@ -8,10 +8,7 @@ import kr.co.apiserver.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -33,8 +30,8 @@ public class OrderController {
 
     // 주문 생성 및 결재 요청
     @PostMapping
-    public ApiResponse<Map<String, String>> requestPayment(@RequestBody OrderRequestDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        String paymentUrl = orderService.createOrderAndRequestPayment(dto, userDetails.getUser());
+    public ApiResponse<Map<String, String>> requestPayment(@RequestHeader String idempotencyKey, @RequestBody OrderRequestDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String paymentUrl = orderService.createOrderAndRequestPayment(idempotencyKey, dto, userDetails.getUser());
         return ApiResponse.ok(Map.of("paymentUrl",paymentUrl));
     }
 }

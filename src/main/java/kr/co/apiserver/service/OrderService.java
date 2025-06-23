@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public interface OrderService {
-    String createOrderAndRequestPayment(OrderRequestDto dto, User user);
+    String createOrderAndRequestPayment(String idempotencyKey, OrderRequestDto dto, User user);
 
     List<OrderPreviewResponseDto> previewOrder(OrderRequestDto dto);
 }

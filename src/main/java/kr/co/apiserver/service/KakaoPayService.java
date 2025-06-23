@@ -27,7 +27,7 @@ public class KakaoPayService implements PaymentService {
     private String frontendBaseUrl;
 
     @Override
-    public String requestPayment(Orders orders){
+    public String requestPaymentUrl(Orders orders){
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -57,6 +57,7 @@ public class KakaoPayService implements PaymentService {
         String redirectUrl = (String) response.getBody().get("next_redirect_pc_url");
 
         orders.setTid(tid);
+        orders.setRedirectUrl(redirectUrl);
         orderRepository.save(orders);
 
         return redirectUrl;
