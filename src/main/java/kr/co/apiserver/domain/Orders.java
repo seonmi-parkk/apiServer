@@ -2,6 +2,7 @@ package kr.co.apiserver.domain;
 
 import jakarta.persistence.*;
 import kr.co.apiserver.domain.emums.OrderStatus;
+import kr.co.apiserver.domain.emums.PaymentType;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,8 @@ public class Orders {
     @Column(nullable = false)
     private OrderStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
     private LocalDateTime paidAt;
 
     private String tid; // 카카오 결제 TID
