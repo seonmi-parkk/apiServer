@@ -96,7 +96,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
         configuration.setAllowedMethods(Arrays.asList("HEAD","GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control" , "Content-Type", "IdempotencyKey"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control" , "Content-Type", "Idempotency-Key"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
