@@ -107,9 +107,23 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
+    /**
+     * 주문 상세 정보 조회
+     * @param ono 주문 번호
+     * @param user 요청한 사용자
+     * @return 주문 상세 정보 DTO
+     */
     @Override
     public OrderDetailResponseDto getOrderDetail(Long ono, User user) {
-        return null;
+        // 주문 정보 조회
+        OrderDetailResponseDto responseDto = orderRepository.findOrderDetailByOno(ono);
+
+        // 요청한 사용자의 주문이 아닌 경우
+        if (!responseDto.getEmail().equals(user.getEmail())) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+
+        return responseDto;
     }
 
     /**

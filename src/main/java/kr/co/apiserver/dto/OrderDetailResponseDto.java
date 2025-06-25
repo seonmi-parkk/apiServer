@@ -1,15 +1,28 @@
 package kr.co.apiserver.dto;
 
-import lombok.Builder;
-import lombok.Setter;
+import kr.co.apiserver.domain.emums.PaymentType;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
+@Getter
 @Setter
-@Builder
+@NoArgsConstructor
 public class OrderDetailResponseDto {
     private Long ono;
     private LocalDateTime paidAt;
-    private Integer totalPrice;
-    private OrderItemResponseDto orderItems;
+    private String paymentType;
+    private int totalPrice;
+    private List<OrderItemResponseDto> OrderItems;
+    private String email;
+
+
+    public OrderDetailResponseDto(Long ono, LocalDateTime paidAt, PaymentType paymentType, int totalPrice, String email) {
+        this.ono = ono;
+        this.paidAt = paidAt;
+        this.paymentType = paymentType.getPaymentName();
+        this.totalPrice = totalPrice;
+        this.email = email;
+    }
 }
