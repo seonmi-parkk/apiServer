@@ -1,7 +1,5 @@
 package kr.co.apiserver.service;
 
-import kr.co.apiserver.dto.PageRequestDto;
-import kr.co.apiserver.dto.PageResponseDto;
 import kr.co.apiserver.dto.ProductDto;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -17,12 +15,7 @@ public class ProductSerivceTest {
     @Autowired
     private ProductService productService;
 
-    @Test
-    public void testList(){
-        PageRequestDto pageRequestDto = PageRequestDto.builder().build();
-        PageResponseDto<ProductDto> responseDto = productService.getList(pageRequestDto);
-        log.info("이미지: "+responseDto.getDtoList().get(6).getUploadedFileNames().toString());
-    }
+
     @Test
     public void testRegister() {
         ProductDto productDto = ProductDto.builder()

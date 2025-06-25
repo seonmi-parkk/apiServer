@@ -1,5 +1,6 @@
 package kr.co.apiserver.domain.emums;
 
 public enum IdempotencyContextType {
-    PAYMENT
+    PAYMENT_REQUEST,
+    PAYMENT_APPROVE
 }

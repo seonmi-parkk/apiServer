@@ -1,23 +1,19 @@
 package kr.co.apiserver.controller;
 
-import kr.co.apiserver.domain.emums.IdempotencyContextType;
-import kr.co.apiserver.dto.IdempotencyInfo;
 import kr.co.apiserver.dto.OrderDetailResponseDto;
 import kr.co.apiserver.dto.OrderPreviewResponseDto;
 import kr.co.apiserver.dto.OrderRequestDto;
 import kr.co.apiserver.response.ApiResponse;
 import kr.co.apiserver.security.UserDetailsImpl;
-import kr.co.apiserver.service.IdempotencyKeyService;
+import kr.co.apiserver.service.IdempotencyService;
 import kr.co.apiserver.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -26,23 +22,12 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
-    private final IdempotencyKeyService idempotencyKeyService;
+    private final IdempotencyService idempotencyService;
 
     // 주문 상품 리스트 (pno -> 상품 정보)
     @PostMapping("/preview")
-    public ApiResponse<Map<String, Object>> previewOrder(@RequestBody OrderRequestDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        // idempotencyKey 생성
-        String idempotencyKey = UUID.randomUUID().toString();
-
-        Map<String, Object> result = Map.of(
-                "orderPreview", orderService.previewOrder(dto),
-                "idempotencyKey", idempotencyKey
-        );
-
-        // Idempotency Key 저장
-        idempotencyKeyService.saveInitial(idempotencyKey, userDetails.getUsername(), IdempotencyContextType.PAYMENT);
-
-        return ApiResponse.ok(result);
+    public ApiResponse<List<OrderPreviewResponseDto>> previewOrder(@RequestBody OrderRequestDto dto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ApiResponse.ok(orderService.previewOrder(dto));
     }
 
     // 주문 생성 및 결재 요청
