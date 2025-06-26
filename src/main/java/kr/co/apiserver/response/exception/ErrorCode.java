@@ -19,6 +19,7 @@ public enum ErrorCode {
     INVALID_TOKEN(401, 40101, "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN(401, 40102, "토큰이 만료되었습니다."),
     NOT_FOUND_TOKEN(401, 40103, "토큰이 존재하지 않습니다."),
+    PASSWORD_MISMATCH(401, 40111, "비밀번호가 일치하지 않습니다."),
     FORBIDDEN(403, 40300, "FORBIDDEN"),
     NOT_FOUND(404, 40400, "NOT_FOUND_DATA"),
     USER_NOT_FOUND(404, 40401, "USER_NOT_FOUND"),
@@ -27,6 +28,7 @@ public enum ErrorCode {
     METHOD_NOT_ALLOWED(405, 40500, "METHOD_NOT_ALLOWED"),
     DUPLICATE_REQUEST(409, 40901, "중복 요청입니다."),
     IDEMPOTENCY_KEY_ALREADY_USED(409, 40911, "이미 사용된 Idempotency Key 입니다."),
+    FILE_SIZE_EXCEEDED(413, 41300, "업로드 가능한 파일 크기를 초과했습니다."),
     INTERNAL_ERROR(500, 50000, "INTERNAL_SERVER_ERROR"),
     PAYMENT_APPROVAL_FAILED(500, 50021, "결제 승인 요청에 실패하였습니다."),
     PAYMENT_API_ERROR(502, 50221, "결제사 API 호출 중 오류가 발생했습니다.");

@@ -7,6 +7,8 @@ import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.User;
 import kr.co.apiserver.domain.emums.UserRole;
 import kr.co.apiserver.dto.UserDto;
+import kr.co.apiserver.dto.UserInfoChangeRequestDto;
+import kr.co.apiserver.dto.UserInfoResponseDto;
 import kr.co.apiserver.dto.UserModifyRequestDto;
 import kr.co.apiserver.repository.UserRepository;
 import kr.co.apiserver.response.exception.CustomException;
@@ -71,6 +73,27 @@ public class UserServiceImpl implements UserService {
         Map<String, String> tokens = jwtUtil.refreshAccessToken(refreshToken, user);
         redisService.saveRefreshToken(user.getEmail(), tokens.get("refreshToken"));
         return tokens;
+    }
+
+    @Override
+    public UserInfoResponseDto getUserInfo(String username) {
+        User user = userRepository.findById(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return UserInfoResponseDto.fromEntity(user);
+    }
+
+    @Override
+    public void changeUserInfo(String username, UserInfoChangeRequestDto requestDto) {
+
+    }
+
+    @Override
+    public boolean verifyPassword(String password, String username) {
+        User user = userRepository.findById(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return passwordEncoder.matches(password, user.getPassword());
     }
 
     @Transactional
