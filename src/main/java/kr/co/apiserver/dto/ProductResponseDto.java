@@ -32,11 +32,7 @@ public class ProductResponseDto {
                 .pno(product.getPno())
                 .sellerEmail(product.getSeller().getEmail())
                 .sellerNickname(product.getSeller().getNickname())
-                .sellerImage(
-                    product.getSeller().getProfileImage() != null ?
-                    product.getSeller().getProfileImage() :
-                    "profile/default-profile.png"
-                )
+                .sellerImage(product.getSeller().getProfileImage())
                 .pname(product.getPname())
                 .price(product.getPrice())
                 .pdesc(product.getPdesc())

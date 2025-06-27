@@ -49,7 +49,7 @@ public class UserDetailsImpl implements UserDetails {
                 .map(Enum::name)
                 .collect(Collectors.joining(",")));
         userInfo.put("profileImage", user.getProfileImage() != null ?
-                user.getProfileImage() : "profile/default-profile.png");
+                user.getProfileImage() : "default-profile.png");
         return userInfo;
     }
 }

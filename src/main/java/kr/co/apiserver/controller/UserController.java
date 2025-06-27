@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -43,32 +44,46 @@ public class UserController {
         return ApiResponse.ok(tokens);
     }
 
+    // 카카오 로그인
     @PostMapping("/auth/kakao")
     public ApiResponse<Map<String, Object>> kakaoCallback(@RequestBody Map<String, String> body) {
         Map<String, Object> result = userService.loginWithKakao(body.get("authCode"));
         return ApiResponse.ok(result);
     }
 
+    // oauth로 가입시 회원 정보 추가 입
     @PatchMapping("/modify")
     public ApiResponse<Void> modifyUser(@Valid @RequestBody UserModifyRequestDto requestDto) {
         userService.modifyUser(requestDto);
         return ApiResponse.ok(null);
     }
 
+    // 로그아웃
     @PostMapping("/logout")
     public void logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         log.info("UserController - logout: " + userDetails.getUsername());
         redisService.deleteRefreshToken(userDetails.getUsername());
     }
 
+    // 마이페이지 회원 상세 정보
     @GetMapping
     public ApiResponse<UserInfoResponseDto> getUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ApiResponse.ok(userService.getUserInfo(userDetails.getUsername()));
     }
 
+    // 프로필 이미지 변경
+    @PatchMapping("/profile")
+    public ApiResponse<String> updateProfileImage(
+            @RequestPart(required = false) MultipartFile file,
+            @RequestPart(required = false) String isDefault,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        String filename = userService.updateProfileImage(file, isDefault, userDetails.getUsername());
+        return ApiResponse.ok(filename);
+    }
 
-
-    @PostMapping("/users/verify-password")
+    // 비밀번호 검증
+    @PostMapping("/verify-password")
     public ApiResponse<Void> verifyPassword(String password, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         boolean isMatch = userService.verifyPassword(password, userDetails.getUsername());
 
@@ -78,6 +93,7 @@ public class UserController {
         return ApiResponse.ok(null);
     }
 
+    // 회원 정보 수정
     @PutMapping
     public ApiResponse<UserInfoChangeRequestDto> changeUserInfo(
             @AuthenticationPrincipal UserDetailsImpl userDetails,

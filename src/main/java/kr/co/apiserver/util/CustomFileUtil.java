@@ -1,6 +1,7 @@
 package kr.co.apiserver.util;
 
 import jakarta.annotation.PostConstruct;
+import kr.co.apiserver.domain.emums.FileCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.coobird.thumbnailator.Thumbnailator;
@@ -43,13 +44,13 @@ public class CustomFileUtil {
         }
     }
 
-    public String saveFile(MultipartFile file, String category){
+    public String saveFile(MultipartFile file, FileCategory category){
 
         if(file == null || file.isEmpty()) {
             return "";
         }
 
-        Path categoryDir = Paths.get(uploadPath, category);
+        Path categoryDir = Paths.get(uploadPath, category.getValue());
         // 썸네일 폴더 경로
         Path thumbDir = categoryDir.resolve("thumb");
 
@@ -64,7 +65,7 @@ public class CustomFileUtil {
             Files.copy(file.getInputStream(), savePath);  // 원본파일 업로드
 
             String contentType = file.getContentType(); // 파일의 MIME 타입
-            if (contentType != null && contentType.startsWith("image")) {
+            if (contentType != null && contentType.startsWith("image") && category.equals(FileCategory.PRODUCT)) {
                 // 이미지 파일인 경우 썸네일 생성
                 Path thumbnailPath = thumbDir.resolve("s_" + savedName);
 
@@ -79,7 +80,7 @@ public class CustomFileUtil {
         return savedName;
     }
 
-    public List<String> saveFiles(List<MultipartFile> files, String category){
+    public List<String> saveFiles(List<MultipartFile> files, FileCategory category){
 
         if(files == null || files.isEmpty()) {
             return List.of();

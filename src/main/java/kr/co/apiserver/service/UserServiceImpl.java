@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.User;
+import kr.co.apiserver.domain.emums.FileCategory;
 import kr.co.apiserver.domain.emums.UserRole;
 import kr.co.apiserver.dto.UserDto;
 import kr.co.apiserver.dto.UserInfoChangeRequestDto;
@@ -13,6 +14,7 @@ import kr.co.apiserver.dto.UserModifyRequestDto;
 import kr.co.apiserver.repository.UserRepository;
 import kr.co.apiserver.response.exception.CustomException;
 import kr.co.apiserver.response.exception.ErrorCode;
+import kr.co.apiserver.util.CustomFileUtil;
 import kr.co.apiserver.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,10 +25,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -39,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
     private final JwtUtil jwtUtil;
+    private final CustomFileUtil fileUtil;
     private final RedisService redisService;
 
     @Value("${kakao.client-id}")
@@ -52,6 +57,9 @@ public class UserServiceImpl implements UserService {
 
     @Value("${kakao.client-secret}")
     private String clientSecret;
+
+    @Value("${user.default-profile}")
+    private String defaultProfile;
 
     @Transactional
     @Override
@@ -94,6 +102,24 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return passwordEncoder.matches(password, user.getPassword());
+    }
+
+    @Transactional
+    @Override
+    public String updateProfileImage(MultipartFile file, String isDefault, String username) {
+        if(isDefault != null && isDefault.equals("true")) {
+            // 프로필 이미지 초기화
+            User user = userRepository.findById(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+            user.changeProfile(null);
+            return defaultProfile;
+        }
+
+        // 프로필 이미지 변경
+        String uploadFilename = fileUtil.saveFile(file, FileCategory.PROFILE);
+        User user = userRepository.findById(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.changeProfile(uploadFilename);
+
+        return uploadFilename;
     }
 
     @Transactional

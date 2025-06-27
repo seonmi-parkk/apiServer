@@ -1,6 +1,7 @@
 package kr.co.apiserver.controller;
 
 import kr.co.apiserver.domain.ProductImage;
+import kr.co.apiserver.domain.emums.FileCategory;
 import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.*;
 import kr.co.apiserver.response.ApiResponse;
@@ -51,7 +52,7 @@ public class ProductController {
     public ApiResponse<Map<String, Long>> register(@AuthenticationPrincipal UserDetailsImpl userDetails, ProductDto productDto) {
         // 파일 업로드 처리
         List<MultipartFile> files = productDto.getFiles();
-        List<String> uploadFilenames = fileUtil.saveFiles(files,"product");
+        List<String> uploadFilenames = fileUtil.saveFiles(files, FileCategory.PRODUCT);
         productDto.setUploadedFileNames(uploadFilenames);
 
         productDto.setStatus(ProductStatus.PENDING);

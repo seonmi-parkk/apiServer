@@ -3,6 +3,7 @@ package kr.co.apiserver.service;
 import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.domain.ProductImage;
+import kr.co.apiserver.domain.emums.FileCategory;
 import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.*;
 import kr.co.apiserver.repository.ProductRepository;
@@ -120,7 +121,7 @@ public class ProductServiceImpl implements ProductService {
             MultipartFile file = dto.getFile();
             if ( file != null) {
                 // 파일 저장
-                String fileName = fileUtil.saveFile(file, "product");
+                String fileName = fileUtil.saveFile(file, FileCategory.PRODUCT);
                 // 새 이미지- 새로 저장
                 ProductImage newImage = new ProductImage();
                 newImage.setFileName(fileName);
