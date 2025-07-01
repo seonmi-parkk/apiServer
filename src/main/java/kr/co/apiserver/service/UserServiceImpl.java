@@ -7,10 +7,7 @@ import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.User;
 import kr.co.apiserver.domain.emums.FileCategory;
 import kr.co.apiserver.domain.emums.UserRole;
-import kr.co.apiserver.dto.UserDto;
-import kr.co.apiserver.dto.UserInfoChangeRequestDto;
-import kr.co.apiserver.dto.UserInfoResponseDto;
-import kr.co.apiserver.dto.UserModifyRequestDto;
+import kr.co.apiserver.dto.*;
 import kr.co.apiserver.repository.UserRepository;
 import kr.co.apiserver.response.exception.CustomException;
 import kr.co.apiserver.response.exception.ErrorCode;
@@ -120,6 +117,18 @@ public class UserServiceImpl implements UserService {
         user.changeProfile(uploadFilename);
 
         return uploadFilename;
+    }
+
+    @Transactional
+    @Override
+    public void changePassword(String username, ChangePasswordRequestDto requestDto) {
+        User user = userRepository.findById(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        if(!passwordEncoder.matches(requestDto.getCurrentPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        user.changePassword(passwordEncoder.encode(requestDto.getNewPassword()));
     }
 
     @Transactional

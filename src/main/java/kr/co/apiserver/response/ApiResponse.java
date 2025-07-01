@@ -25,6 +25,10 @@ public class ApiResponse<T> {
         return new ApiResponse<>(errorCode.getCode(), errorCode.getMessage(), null);
     }
 
+    public static <T>ApiResponse<T> errorWithData(ErrorCode errorCode, T data) {
+        return new ApiResponse<>(errorCode.getCode(), errorCode.getMessage(), data);
+    }
+
     public static ApiResponse<Map<String, String>> validException(BindingResult bindingResult) {
 
         Map<String, String> errors = new HashMap<>();

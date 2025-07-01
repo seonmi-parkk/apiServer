@@ -1,10 +1,7 @@
 package kr.co.apiserver.service;
 
 import jakarta.validation.Valid;
-import kr.co.apiserver.dto.UserDto;
-import kr.co.apiserver.dto.UserInfoChangeRequestDto;
-import kr.co.apiserver.dto.UserInfoResponseDto;
-import kr.co.apiserver.dto.UserModifyRequestDto;
+import kr.co.apiserver.dto.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
@@ -25,4 +22,6 @@ public interface UserService {
 
 
     String updateProfileImage(MultipartFile file, String isDefault, String username);
+
+    void changePassword(String username, @Valid ChangePasswordRequestDto requestDto);
 }

@@ -1,10 +1,7 @@
 package kr.co.apiserver.controller;
 
 import jakarta.validation.Valid;
-import kr.co.apiserver.dto.UserDto;
-import kr.co.apiserver.dto.UserInfoChangeRequestDto;
-import kr.co.apiserver.dto.UserInfoResponseDto;
-import kr.co.apiserver.dto.UserModifyRequestDto;
+import kr.co.apiserver.dto.*;
 import kr.co.apiserver.response.ApiResponse;
 import kr.co.apiserver.response.exception.CustomException;
 import kr.co.apiserver.response.exception.ErrorCode;
@@ -82,16 +79,26 @@ public class UserController {
         return ApiResponse.ok(filename);
     }
 
-    // 비밀번호 검증
-    @PostMapping("/verify-password")
-    public ApiResponse<Void> verifyPassword(String password, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        boolean isMatch = userService.verifyPassword(password, userDetails.getUsername());
-
-        if (!isMatch) {
-            return ApiResponse.error(ErrorCode.PASSWORD_MISMATCH);
-        }
+    // 비밀번호 변경
+    @PatchMapping("/password")
+    public ApiResponse<Void> updatePassword(
+            @Valid @RequestBody ChangePasswordRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ){
+        userService.changePassword(userDetails.getUsername(), requestDto);
         return ApiResponse.ok(null);
     }
+
+    // 비밀번호 검증
+//    @PostMapping("/verify-password")
+//    public ApiResponse<Void> verifyPassword(String password, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//        boolean isMatch = userService.verifyPassword(password, userDetails.getUsername());
+//
+//        if (!isMatch) {
+//            return ApiResponse.error(ErrorCode.PASSWORD_MISMATCH);
+//        }
+//        return ApiResponse.ok(null);
+//    }
 
     // 회원 정보 수정
     @PutMapping

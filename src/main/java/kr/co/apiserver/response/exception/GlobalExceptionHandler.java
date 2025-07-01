@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class})
     public ResponseEntity<ApiResponse<Map<String, String>>> handleMethodValidException(MethodArgumentNotValidException e) {
         log.error("BindException" + e.getMessage());
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.validException(e.getBindingResult()));
     }
 
