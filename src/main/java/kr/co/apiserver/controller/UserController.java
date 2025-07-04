@@ -10,8 +10,6 @@ import kr.co.apiserver.service.RedisService;
 import kr.co.apiserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -100,13 +98,18 @@ public class UserController {
 //        return ApiResponse.ok(null);
 //    }
 
-    // 회원 정보 수정
-    @PutMapping
-    public ApiResponse<UserInfoChangeRequestDto> changeUserInfo(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @Valid @RequestBody UserInfoChangeRequestDto requestDto
-    ) {
-        userService.changeUserInfo(userDetails.getUsername(), requestDto);
-        return ApiResponse.ok(requestDto);
+    // 닉네임 중복 조회
+    @GetMapping("/check-nickname")
+    public ApiResponse<Map<String, Boolean>> checkNickname(@RequestParam String nickname) {
+        boolean isDuplicate = userService.isNicknameDuplicated(nickname);
+        return ApiResponse.ok(Map.of("isDuplicate", isDuplicate));
     }
+
+    // 닉네임 수정
+    @PatchMapping("/nickname")
+    public ApiResponse<String> changeNickname(@RequestBody ChangeNicknameRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.changeNickname(requestDto.getNickname(), userDetails.getUsername());
+        return ApiResponse.ok(requestDto.getNickname());
+    }
+
 }

@@ -18,14 +18,16 @@ import java.util.List;
 public class ProductResponseDto {
 
     private Long pno;
-    private String sellerEmail;
-    private String sellerNickname;
-    private String sellerImage;
     private String pname;
     private int price;
     private String pdesc;
     private String status;
     private String statusName;
+    private String sellerEmail;
+    private String sellerNickname;
+    private String sellerImage;
+    private List<String> uploadedFileNames = new ArrayList<>();
+
 
     public static ProductResponseDto fromEntity(Product product) {
         return ProductResponseDto.builder()
@@ -43,7 +45,5 @@ public class ProductResponseDto {
                         .toList())
                 .build();
     }
-
-    private List<String> uploadedFileNames = new ArrayList<>();
 
 }

@@ -46,7 +46,7 @@ public class CartServiceImpl implements CartService {
         // 이미 장바구니에 해당 아이템이 있는 경우 예외 처리
         Optional<CartItem> optionalCartItem = cartItemRepository.findCartItemByEmailAndPno(email, pno);
         optionalCartItem.ifPresent(throwable -> {
-            throw new CustomException(ErrorCode.CART_DUPLICATE_ITEM);
+            throw new CustomException(ErrorCode.DUPLICATED_CART_ITEM);
         });
 
         // 해당 email의 장바구니 조회 -> 없으면 생성

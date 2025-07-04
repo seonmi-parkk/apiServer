@@ -129,7 +129,7 @@ public class ProductController {
 
         productService.remove(pno);
 
-        fileUtil.deleteFiles(oldFileNames);
+        fileUtil.deleteFiles(oldFileNames, FileCategory.PRODUCT);
 
         return ApiResponse.ok(null);
     }

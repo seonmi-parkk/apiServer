@@ -104,17 +104,24 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public String updateProfileImage(MultipartFile file, String isDefault, String username) {
+        User user = userRepository.findById(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        String previousProfile = user.getProfileImage();
+
+        // 프로필 이미지 초기화
         if(isDefault != null && isDefault.equals("true")) {
-            // 프로필 이미지 초기화
-            User user = userRepository.findById(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
             user.changeProfile(null);
             return defaultProfile;
         }
 
-        // 프로필 이미지 변경
+        // 새 프로필 이미지 저장
         String uploadFilename = fileUtil.saveFile(file, FileCategory.PROFILE);
-        User user = userRepository.findById(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        // 새 프로필 이미지 db 반영
         user.changeProfile(uploadFilename);
+
+        // 기존 프로필 이미지 파일삭제
+        if(previousProfile != null) {
+            fileUtil.deleteFile(previousProfile, FileCategory.PROFILE);
+        }
 
         return uploadFilename;
     }
@@ -129,6 +136,25 @@ public class UserServiceImpl implements UserService {
         }
 
         user.changePassword(passwordEncoder.encode(requestDto.getNewPassword()));
+    }
+
+    @Override
+    public boolean isNicknameDuplicated(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
+
+    @Transactional
+    @Override
+    public void changeNickname(String nickname, String username) {
+        User user = userRepository.findById(username)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 닉네임 중복 체크
+        if(isNicknameDuplicated(nickname)) {
+            throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
+        }
+
+        user.changeNickname(nickname);
     }
 
     @Transactional

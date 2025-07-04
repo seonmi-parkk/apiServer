@@ -8,13 +8,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ErrorCode {
     BAD_REQUEST(400, 40000, "BAD_REQUEST"),
-    CART_DUPLICATE_ITEM(400, 40001, "이미 장바구니에 담긴 상품입니다."),
+    DUPLICATED_CART_ITEM(400, 40001, "이미 장바구니에 담긴 상품입니다."),
     PURCHASE_NOT_AVAILABLE(400, 40011, "해당 상품은 구매가 불가능합니다."),
     INVALID_PAYMENT_REQUEST(400, 40021,"잘못된 결제 요청입니다."),
     UNSUPPORTED_PAYMENT_METHOD(400, 40022, "지원하지 않는 결제 방법입니다."),
     PAYMENT_READY_FAILED(400, 40023, "결제 요청페이지 생성에 실패하였습니다."),
     IDEMPOTENCY_KEY_REQUIRED(400, 40031,"Idempotency Key가 누락되었습니다."),
     INVALID_IDEMPOTENCY_KEY(400, 40032,"유효하지 않은 Idempotency Key 입니다."),
+    DUPLICATED_NICKNAME(400, 40041, "이미 사용중인 닉네임입니다."),
     UNAUTHORIZED(401, 40100, "UNAUTHORIZED"),
     INVALID_TOKEN(401, 40101, "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN(401, 40102, "토큰이 만료되었습니다."),

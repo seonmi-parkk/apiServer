@@ -108,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
             product.removeImage(image);
             toDeleteNames.add(image.getFileName());
         }
-        fileUtil.deleteFiles(toDeleteNames);
+        fileUtil.deleteFiles(toDeleteNames, FileCategory.PRODUCT);
 
         // 상품 변경내용 반영
         product.changePrice(requestDto.getPrice());

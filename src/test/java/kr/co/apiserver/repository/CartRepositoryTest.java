@@ -1,6 +1,5 @@
 package kr.co.apiserver.repository;
 
-import jakarta.transaction.Transactional;
 import kr.co.apiserver.domain.Cart;
 import kr.co.apiserver.domain.CartItem;
 import kr.co.apiserver.domain.Product;
@@ -34,7 +33,7 @@ public class CartRepositoryTest {
         // 장바구니 아이템 확인 있으면 예외 메세지
         Optional<CartItem> cartItem = cartItemRepository.findCartItemByEmailAndPno(email, pno);
         if(!cartItem.isEmpty()){
-           throw new CustomException(ErrorCode.CART_DUPLICATE_ITEM);
+           throw new CustomException(ErrorCode.DUPLICATED_CART_ITEM);
         }
 
         Optional<Cart> OptionalCart = cartRepository.findByUser_Email(email);

@@ -24,4 +24,8 @@ public interface UserService {
     String updateProfileImage(MultipartFile file, String isDefault, String username);
 
     void changePassword(String username, @Valid ChangePasswordRequestDto requestDto);
+
+    boolean isNicknameDuplicated(String nickname);
+
+    void changeNickname(String nickname, String username);
 }

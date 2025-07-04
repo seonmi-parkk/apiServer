@@ -115,26 +115,38 @@ public class CustomFileUtil {
         return ResponseEntity.ok().headers(headers).body(resource);
     }
 
-    public void deleteFiles(List<String> fileNames) {
+    public void deleteFiles(List<String> fileNames, FileCategory category) {
         if(fileNames == null || fileNames.isEmpty()) {
             return;
         }
 
-        fileNames.forEach(fileName -> {
+        for (String fileName : fileNames) {
+            // 단건 파일 deleteFile메서드 추가해서 수정 && 사용하는 부분들 코드 수정해야함
+            deleteFile(fileName, category);
+        }
+    }
 
-            // 썸네일
-            String thumbnailFileName = "s_"+ fileName;
+    public void deleteFile(String fileName, FileCategory category){
+        // 상품 이미지의 경우 썸네일도 삭제
+        if(category.equals(FileCategory.PRODUCT)) {
+            String thumbFileName = "s_" + fileName;
+            deleteFile(thumbFileName, category);
+        }
 
-            Path thumbnailPath = Paths.get(uploadPath, thumbnailFileName);
-            Path filePath = Paths.get(uploadPath, fileName);
+        // 원본 파일 삭제
+        doDeleteFile(fileName, category);
 
-            try {
-                Files.deleteIfExists(thumbnailPath);
-                Files.deleteIfExists(filePath);
-            } catch (IOException e) {
-                throw new RuntimeException(e.getMessage());
-            }
-        });
+        // Path thumbnailPath = Paths.get(uploadPath, thumbFileName);
+    }
+
+    public void doDeleteFile(String fileName, FileCategory category) {
+        Path filePath = Paths.get(uploadPath, category.getValue(), fileName);
+        try {
+            boolean result = Files.deleteIfExists(filePath);
+            log.info("Deleted file: {}, result: {}" ,filePath, result);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
 
