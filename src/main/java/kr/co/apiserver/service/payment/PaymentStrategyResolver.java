@@ -18,7 +18,7 @@ public class PaymentStrategyResolver {
 
     @PostConstruct
     public void init() {
-        log.info("strategyMap keys: {}", strategyMap.keySet());  // ["KAKAOPAY"]
+        log.info("strategyMap keys: {}", strategyMap.keySet());
     }
 
     public PaymentStrategy resolve(String paymentMethod) {

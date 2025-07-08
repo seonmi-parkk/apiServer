@@ -6,14 +6,18 @@ import kr.co.apiserver.response.ApiResponse;
 import kr.co.apiserver.response.exception.CustomException;
 import kr.co.apiserver.response.exception.ErrorCode;
 import kr.co.apiserver.security.UserDetailsImpl;
+import kr.co.apiserver.service.EmailVerificationService;
 import kr.co.apiserver.service.RedisService;
 import kr.co.apiserver.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Duration;
 import java.util.Map;
 
 @RestController
@@ -24,6 +28,7 @@ public class UserController {
 
     private final UserService userService;
     private final RedisService redisService;
+    private final EmailVerificationService emailVerificationService;
 
     // access token 재발급
     @PostMapping("/refresh")
@@ -110,6 +115,35 @@ public class UserController {
     public ApiResponse<String> changeNickname(@RequestBody ChangeNicknameRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         userService.changeNickname(requestDto.getNickname(), userDetails.getUsername());
         return ApiResponse.ok(requestDto.getNickname());
+    }
+
+    /**
+     * 이메일 인증 코드 전송
+     * @param requestDto 이메일 인증 코드 발송 요청 DTO
+     * @return ApiResponse<Void>
+     */
+    @PostMapping("/email-verification")
+    public ApiResponse<Void> sendVerificationEmail(@Valid @RequestBody SendEmailVerificationRequestDto requestDto) {
+        userService.sendVerificationEmail(requestDto.getEmail());
+       return ApiResponse.ok(null);
+    }
+
+    /**
+     * 이메일 인증 코드 확인
+     * @param requestDto 이메일 인증 코드 확인 요청 DTO
+     * @return ApiResponse<Void>
+     */
+    @PostMapping("/email-verification/verify")
+    public ApiResponse<Void> verifyEmailCode(@Valid @RequestBody EmailVerifyRequestDto requestDto) {
+        boolean valid = userService.verifyEmailCode(requestDto);
+
+        if (valid) {
+            // 인증 코드가 유효한 경우
+            return ApiResponse.ok(null);
+        } else {
+            // 인증 코드가 유효하지 않은 경우
+            return ApiResponse.error(ErrorCode.INVALID_EMAIL_CODE);
+        }
     }
 
 }

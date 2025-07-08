@@ -15,7 +15,13 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // 결재 승인
+    /**
+     * 결제 승인 요청
+     * @param idempotencyKey 중복 요청 방지를 위한 키
+     * @param requestDto 결제 승인 요청 DTO
+     * @param userDetails 사용자 정보
+     * @return 결제 승인 결과 URL
+     */
     @PutMapping("/approve")
     public ApiResponse<String> approvePayment(
             @RequestHeader("Idempotency-Key") String idempotencyKey,

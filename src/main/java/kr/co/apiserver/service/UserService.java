@@ -2,6 +2,7 @@ package kr.co.apiserver.service;
 
 import jakarta.validation.Valid;
 import kr.co.apiserver.dto.*;
+import kr.co.apiserver.response.ApiResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
@@ -28,4 +29,8 @@ public interface UserService {
     boolean isNicknameDuplicated(String nickname);
 
     void changeNickname(String nickname, String username);
+
+    void sendVerificationEmail(String email);
+
+    boolean verifyEmailCode(@Valid EmailVerifyRequestDto requestDto);
 }

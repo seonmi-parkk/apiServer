@@ -9,6 +9,7 @@ import kr.co.apiserver.domain.emums.FileCategory;
 import kr.co.apiserver.domain.emums.UserRole;
 import kr.co.apiserver.dto.*;
 import kr.co.apiserver.repository.UserRepository;
+import kr.co.apiserver.response.ApiResponse;
 import kr.co.apiserver.response.exception.CustomException;
 import kr.co.apiserver.response.exception.ErrorCode;
 import kr.co.apiserver.util.CustomFileUtil;
@@ -42,6 +43,7 @@ public class UserServiceImpl implements UserService {
     private final JwtUtil jwtUtil;
     private final CustomFileUtil fileUtil;
     private final RedisService redisService;
+    private final EmailVerificationService emailVerificationService;
 
     @Value("${kakao.client-id}")
     private String clientId;
@@ -155,6 +157,35 @@ public class UserServiceImpl implements UserService {
         }
 
         user.changeNickname(nickname);
+    }
+
+    @Override
+    public void sendVerificationEmail(String email) {
+        // 이메일 중복 체크
+        userRepository.findById(email).ifPresent(e -> {
+            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
+        });
+
+        // 이메일 인증 코드 전송
+        emailVerificationService.sendCode(email);
+    }
+
+    @Override
+    public boolean verifyEmailCode(EmailVerifyRequestDto requestDto) {
+        String email = requestDto.getEmail();
+
+        // 이메일 인증 코드 확인
+        boolean valid = emailVerificationService.verifyCode(email, requestDto.getCode());
+
+        // 인증 코드가 유효한 경우
+        if (valid) {
+            // redis에 인증된 이메일 저장
+            emailVerificationService.clearCode(email);
+            emailVerificationService.saveVerifiedEmail(email);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Transactional

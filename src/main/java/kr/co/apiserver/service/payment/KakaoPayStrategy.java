@@ -27,6 +27,11 @@ public class KakaoPayStrategy implements PaymentStrategy {
     @Value("${frontend.base-url}")
     private String frontendBaseUrl;
 
+    /**
+     * 카카오페이 결제 요청
+     * @param orders 주문 정보
+     * @return 결제 페이지로 리다이렉트할 URL
+     */
     @Override
     public String sendPaymentUrlRequest(Orders orders){
 
@@ -71,6 +76,11 @@ public class KakaoPayStrategy implements PaymentStrategy {
         }
     }
 
+    /**
+     * 카카오페이 결제 승인 요청
+     * @param order 주문 정보
+     * @param requestDto 결제 승인 요청 DTO
+     */
     @Override
     public void sendPaymentApprovalRequest(Orders order, PaymentApproveRequestDto requestDto) {
         RestTemplate restTemplate = new RestTemplate();

@@ -16,6 +16,8 @@ public enum ErrorCode {
     IDEMPOTENCY_KEY_REQUIRED(400, 40031,"Idempotency Key가 누락되었습니다."),
     INVALID_IDEMPOTENCY_KEY(400, 40032,"유효하지 않은 Idempotency Key 입니다."),
     DUPLICATED_NICKNAME(400, 40041, "이미 사용중인 닉네임입니다."),
+    DUPLICATED_EMAIL(400, 40042, "이미 가입된 이메일입니다."),
+    INVALID_EMAIL_CODE(400, 40043, "이메일 인증 코드가 올바르지 않거나 만료되었습니다."),
     UNAUTHORIZED(401, 40100, "UNAUTHORIZED"),
     INVALID_TOKEN(401, 40101, "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN(401, 40102, "토큰이 만료되었습니다."),
