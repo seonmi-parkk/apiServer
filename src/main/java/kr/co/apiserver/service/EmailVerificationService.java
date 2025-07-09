@@ -48,4 +48,13 @@ public class EmailVerificationService {
         redisTemplate.opsForValue().set("VERIFIED_EMAIL:" + email, "true", Duration.ofMinutes(30));
     }
 
+    public boolean isVerified(String email) {
+        String key = "VERIFIED_EMAIL:" + email;
+        return redisTemplate.hasKey(key);
+    }
+
+    public void clearVerifiedEmail(String email) {
+        redisTemplate.delete("VERIFIED_EMAIL:" + email);
+    }
+
 }

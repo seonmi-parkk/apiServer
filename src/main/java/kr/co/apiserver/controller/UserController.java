@@ -65,6 +65,14 @@ public class UserController {
         redisService.deleteRefreshToken(userDetails.getUsername());
     }
 
+    // 회원가입
+    @PostMapping("/signup")
+    public ApiResponse<Void> signup(@Valid @RequestBody signupRequestDto requestDto) {
+        userService.signup(requestDto);
+        return ApiResponse.ok(null);
+    }
+
+
     // 마이페이지 회원 상세 정보
     @GetMapping
     public ApiResponse<UserInfoResponseDto> getUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetails) {

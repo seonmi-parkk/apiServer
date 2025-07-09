@@ -42,8 +42,11 @@ public class JwtCheckFilter extends OncePerRequestFilter {
 
         // 로그인 관련 요청 / 이미지 조회 경로
         if( path.startsWith("/user/login")
+                || path.startsWith("/user/signup")
             || path.startsWith("/user/auth/kakao")
             || path.startsWith("/user/refresh")
+            || path.startsWith("/user/check-nickname")
+            || path.startsWith("/user/email-verification")
             || path.startsWith("/upload/")
             || path.startsWith("/products/view/")
             || path.startsWith("/products/") && method.equals("GET")

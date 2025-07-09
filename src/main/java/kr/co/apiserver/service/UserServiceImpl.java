@@ -162,9 +162,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void sendVerificationEmail(String email) {
         // 이메일 중복 체크
-        userRepository.findById(email).ifPresent(e -> {
-            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
-        });
+        CheckDuplicatedEmail(email);
 
         // 이메일 인증 코드 전송
         emailVerificationService.sendCode(email);
@@ -186,6 +184,35 @@ public class UserServiceImpl implements UserService {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void signup(signupRequestDto requestDto) {
+        // 이메일 중복 체크
+        CheckDuplicatedEmail(requestDto.getEmail());
+
+        // 이메일 인증여부 확인
+        if (!emailVerificationService.isVerified(requestDto.getEmail())) {
+            throw new CustomException(ErrorCode.EMAIL_NOT_VERIFIED);
+        }
+
+        // 닉네임 중복 체크
+        if (userRepository.existsByNickname(requestDto.getNickname())) {
+            throw new CustomException(ErrorCode.DUPLICATED_NICKNAME);
+        }
+
+        // db에 정보저장
+        User user = User.builder()
+            .email(requestDto.getEmail())
+            .password(passwordEncoder.encode(requestDto.getPassword()))
+            .nickname(requestDto.getNickname())
+            .isSocial(false)
+            .build();
+        user.addRole(UserRole.USER);
+        userRepository.save(user);
+
+        // redis 인증 완료 정보 삭제
+        emailVerificationService.clearVerifiedEmail(requestDto.getEmail());
     }
 
     @Transactional
@@ -303,4 +330,12 @@ public class UserServiceImpl implements UserService {
 
         return user;
     }
+
+    // 이메일 중복 체크
+    private void CheckDuplicatedEmail(String email) {
+        userRepository.findById(email).ifPresent(e -> {
+            throw new CustomException(ErrorCode.DUPLICATED_EMAIL);
+        });
+    }
+
 }

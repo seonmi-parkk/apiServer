@@ -33,4 +33,6 @@ public interface UserService {
     void sendVerificationEmail(String email);
 
     boolean verifyEmailCode(@Valid EmailVerifyRequestDto requestDto);
+
+    void signup(@Valid signupRequestDto requestDto);
 }
