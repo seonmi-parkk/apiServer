@@ -17,6 +17,7 @@ public class ProductModifyRequestDto {
     private String pname;
     private int price;
     private String pdesc;
-    List<ImageModifyRequestDto> images = new ArrayList<>();
+    private List<ImageModifyRequestDto> images = new ArrayList<>();
+    private List<Long> productCategories = new ArrayList<>();
 
 }

@@ -64,7 +64,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) ->
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
-                        .requestMatchers("/", "/user/**","/products/view/**", "/upload/**").permitAll() // 메인, 로그인, 회원가입 페이지, 이미지 접근 허용
+                        .requestMatchers("/", "/user/**","/products/view/**", "/upload/**", "/categories/list").permitAll() // 메인, 로그인, 회원가입 페이지, 이미지 접근 허용
                         .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated() // 그 외 모든 요청 인증처리
@@ -94,7 +94,8 @@ public class SecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
+        //configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("HEAD","GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control" , "Content-Type", "Idempotency-Key"));
         configuration.setAllowCredentials(true);

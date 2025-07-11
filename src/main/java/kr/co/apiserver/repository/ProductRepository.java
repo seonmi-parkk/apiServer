@@ -15,8 +15,9 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
 
     @Query("select p from Product p " +
             "join fetch p.seller " +
-            "left join fetch p.imageList where p.pno = :pno")
-    Optional<Product> findByIdWithImages(Long pno);
+            "left join fetch p.imageList " +
+            "where p.pno = :pno")
+    Optional<Product> findByIdWithImagesAndProductCategories(Long pno);
 
     @EntityGraph(attributePaths = "imageList")
     @Query("SELECT p FROM Product p WHERE p.pno = :pno")

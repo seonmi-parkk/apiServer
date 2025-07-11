@@ -6,6 +6,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.List;
+
 @SuperBuilder
 @Getter
 @Setter
@@ -24,6 +26,8 @@ public class PageRequestDto {
 
     @Builder.Default
     private String sortBy = "id";
+
+    private List<Long> categories;
 
     // 페이지 0 또는 음수일 경우 방어
     public void setPage(int page) {

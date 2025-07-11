@@ -1,11 +1,13 @@
 package kr.co.apiserver.service;
 
 import jakarta.transaction.Transactional;
+import kr.co.apiserver.domain.Category;
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.domain.ProductImage;
 import kr.co.apiserver.domain.emums.FileCategory;
 import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.*;
+import kr.co.apiserver.repository.CategoryRepository;
 import kr.co.apiserver.repository.ProductRepository;
 import kr.co.apiserver.response.exception.CustomException;
 import kr.co.apiserver.response.exception.ErrorCode;
@@ -27,55 +29,38 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final CustomFileUtil fileUtil;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public PageResponseDto<ProductListResponseDto> getList(PageRequestDto pageRequestDto) {
-        log.info("getPage : "+pageRequestDto.getPage());
-        log.info("getSize : "+pageRequestDto.getSize());
+
         // JPA
         Page<ProductListResponseDto> dtoList  = productRepository.searchList(pageRequestDto, pageRequestDto.toPageable());
 
         return new PageResponseDto<>(dtoList);
-//        Pageable pageable = PageRequest.of(
-//                pageRequestDto.getPage()-1,
-//                pageRequestDto.getSize(),
-//                Sort.by("pno").descending()
-//        );
 //
-//        Page<Object[]> result = productRepository.selectList(pageable);
 //
-//        List<ProductDto> dtoList = result.get().map(arr -> {
-//            ProductDto productDto = new ProductDto();
-//            return ProductDto;
-//        }).collect(Collectors.toList());
 //
-//        long totalCount = result.getTotalElements();
-//
-//        return PageResponseDto.<ProductDto>withAll()
-//                .dtoList(dtoList)
-//                .totalCount(totalCount)
-//                .pageRequestDto(pageRequestDto)
-//                .build();
-//        return null;
     }
 
     @Transactional
     @Override
     public Long register(ProductDto productDto) {
         Product product = Product.createProduct(productDto);
-        //log.info("==============product{} // imageList{} : ",product, product.getImageList());
+
+        categoryRepository.findAllById(productDto.getProductCategories())
+                .forEach(category -> product.addCategory(category));
+
         Long pno = productRepository.save(product).getPno();
-        log.info("register pno : "+pno);
+
         return pno;
     }
 
     @Override
     public ProductResponseDto getProductDetail(Long pno) {
-        Optional<Product> result = productRepository.findByIdWithImages(pno);
+        Optional<Product> result = productRepository.findByIdWithImagesAndProductCategories(pno);
 
         Product product = result.orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
-
-        log.info("==============product{} // imageList{} : ",product, product.getImageList());
 
         return ProductResponseDto.fromEntity(product);
     }
@@ -114,6 +99,11 @@ public class ProductServiceImpl implements ProductService {
         product.changePrice(requestDto.getPrice());
         product.changeName(requestDto.getPname());
         product.changeDesc(requestDto.getPdesc());
+
+        // 상품 카테고리 변경
+        product.clearCategories();
+        List<Category> newCategories = categoryRepository.findAllById(requestDto.getProductCategories());
+        newCategories.forEach(category -> product.addCategory(category));
 
         // 남은 이미지 처리
         int ord = 0;
@@ -173,7 +163,7 @@ public class ProductServiceImpl implements ProductService {
 
     // 상품 수정 전 검증
     private Product validateWritable(Long pno, String userEmail) {
-        Product product = productRepository.findByIdWithImages(pno)
+        Product product = productRepository.findById(pno)
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
         if (product.getStatus() != ProductStatus.PENDING) {
             throw new CustomException(ErrorCode.BAD_REQUEST);

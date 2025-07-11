@@ -39,6 +39,9 @@ public class ProductDto {
     }
 
     @Builder.Default
+    private List<Long> productCategories = new ArrayList<>(); // 카테고리 id
+
+    @Builder.Default
     private List<MultipartFile> files = new ArrayList<>(); // 파일 업로드시
 
     @Builder.Default

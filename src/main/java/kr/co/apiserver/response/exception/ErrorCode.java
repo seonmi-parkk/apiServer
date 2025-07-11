@@ -19,6 +19,7 @@ public enum ErrorCode {
     DUPLICATED_EMAIL(400, 40042, "이미 가입된 이메일입니다."),
     INVALID_EMAIL_CODE(400, 40043, "이메일 인증 코드가 올바르지 않거나 만료되었습니다."),
     EMAIL_NOT_VERIFIED(400, 40044, "인증되지 않은 이메일입니다."),
+    CATEGORY_LIMIT_EXCEEDED(400, 40051, "카테고리는 최대 5개까지 등록할 수 있습니다."),
     UNAUTHORIZED(401, 40100, "UNAUTHORIZED"),
     INVALID_TOKEN(401, 40101, "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN(401, 40102, "토큰이 만료되었습니다."),

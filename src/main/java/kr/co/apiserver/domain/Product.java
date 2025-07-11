@@ -3,10 +3,14 @@ package kr.co.apiserver.domain;
 import jakarta.persistence.*;
 import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.ProductDto;
+import kr.co.apiserver.response.exception.CustomException;
+import kr.co.apiserver.response.exception.ErrorCode;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -32,13 +36,15 @@ public class Product {
     private int price;
 
     private String pdesc;
-    // private boolean deleted;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private ProductStatus status = ProductStatus.PENDING;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductCategory> productCategories = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("ord asc")
@@ -64,13 +70,6 @@ public class Product {
         uploadedFileNames.forEach(fileName -> {
             product.addImageString(fileName);
         });
-//        productDto.getFiles().forEach(file -> {
-//            ProductImage image = ProductImage.builder()
-//                    .fileName(file.getOriginalFilename())
-//                    .build();
-//            product.addImage(image);
-
-//        });
 
         return product;
     }
@@ -86,10 +85,6 @@ public class Product {
     public void changeName(String name) {
         this.pname = name;
     }
-
-//    public void changeDeleted(boolean deleted) {
-//        this.deleted = deleted;
-//    }
 
     public void changeStatus(ProductStatus status) {
         this.status = status;
@@ -115,7 +110,19 @@ public class Product {
         image.setProduct(null); // 연관관계 끊기
     }
 
-//    public void clearList() {
-//        this.imageList.clear();
-//    }
+    public void addCategory(Category category) {
+        // 카테고리 수 최대 5개 제한
+        if (this.productCategories.size() > 5) {
+            throw new CustomException(ErrorCode.CATEGORY_LIMIT_EXCEEDED);
+        }
+
+        ProductCategory productCategory = new ProductCategory();
+        productCategory.setProduct(this);
+        productCategory.setCategory(category);
+        this.productCategories.add(productCategory);
+    }
+
+    public void clearCategories() {
+        this.productCategories.clear();
+    }
 }

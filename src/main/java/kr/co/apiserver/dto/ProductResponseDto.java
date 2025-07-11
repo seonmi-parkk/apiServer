@@ -27,6 +27,7 @@ public class ProductResponseDto {
     private String sellerNickname;
     private String sellerImage;
     private List<String> uploadedFileNames = new ArrayList<>();
+    private List<String> productCategories = new ArrayList<>();
 
 
     public static ProductResponseDto fromEntity(Product product) {
@@ -42,6 +43,9 @@ public class ProductResponseDto {
                 .statusName(product.getStatus().getMessage())
                 .uploadedFileNames(product.getImageList().stream()
                         .map(ProductImage::getFileName)
+                        .toList())
+                .productCategories(product.getProductCategories().stream()
+                        .map(category -> category.getCategory().getName())
                         .toList())
                 .build();
     }

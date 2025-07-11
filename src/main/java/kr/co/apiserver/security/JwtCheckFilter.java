@@ -42,7 +42,7 @@ public class JwtCheckFilter extends OncePerRequestFilter {
 
         // 로그인 관련 요청 / 이미지 조회 경로
         if( path.startsWith("/user/login")
-                || path.startsWith("/user/signup")
+            || path.startsWith("/user/signup")
             || path.startsWith("/user/auth/kakao")
             || path.startsWith("/user/refresh")
             || path.startsWith("/user/check-nickname")
@@ -50,6 +50,7 @@ public class JwtCheckFilter extends OncePerRequestFilter {
             || path.startsWith("/upload/")
             || path.startsWith("/products/view/")
             || path.startsWith("/products/") && method.equals("GET")
+            || path.startsWith("/categories/list")
         ) {
             return true;
         }
@@ -66,20 +67,8 @@ public class JwtCheckFilter extends OncePerRequestFilter {
 
             String accessToken = authorizationHeader.substring(7);
             String username = jwtUtil.validateToken(accessToken);
-           // log.info("claims : " + claims);
-
-//            String email = (String) claims.get("email");
-//            String password = (String) claims.get("password");
-//            String nickname = (String) claims.get("nickname");
-//            Boolean isSocial = (Boolean) claims.get("isSocial");
-//            List<String> roleNames = (List<String>) claims.get("roleNames");
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            //UserDto userDto = new UserDto(email, password, nickname, isSocial, roleNames);
-
-            log.info("-------------userDetails : " + userDetails);
-            log.info("-------------userDetails.getAuthorities() : " + userDetails.getAuthorities());
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);

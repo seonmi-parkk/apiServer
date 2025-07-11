@@ -130,7 +130,7 @@ public class CustomFileUtil {
         // 상품 이미지의 경우 썸네일도 삭제
         if(category.equals(FileCategory.PRODUCT)) {
             String thumbFileName = "s_" + fileName;
-            deleteFile(thumbFileName, category);
+            doDeleteFile(thumbFileName, category);
         }
 
         // 원본 파일 삭제
