@@ -1,6 +1,7 @@
 package kr.co.apiserver.repository;
 
 import kr.co.apiserver.domain.Product;
+import kr.co.apiserver.domain.emums.ProductStatus;
 import kr.co.apiserver.dto.OrderPreviewResponseDto;
 import kr.co.apiserver.repository.search.ProductSearch;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -30,4 +31,6 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
              " and pi.ord= 0 " +
             "where p.pno in :pnos")
     Optional<List<OrderPreviewResponseDto>> getOrderPrivewInfo(@Param("pnos") List<Long> productsNos);
+
+    List<Product> findByStatus(ProductStatus status);
 }
