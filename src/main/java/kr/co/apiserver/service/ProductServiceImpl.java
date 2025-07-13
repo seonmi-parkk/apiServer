@@ -161,6 +161,18 @@ public class ProductServiceImpl implements ProductService {
         product.changeStatus(ProductStatus.APPROVED);
     }
 
+    @Override
+    public void changeStatusToApproved(Long pno) {
+        Product product = productRepository.findById(pno)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 승인 대기 상태인 상품만 승인 가능
+        if (!product.getStatus().equals(ProductStatus.PENDING)) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+        product.changeStatus(ProductStatus.APPROVED);
+    }
+
     // 상품 수정 전 검증
     private Product validateWritable(Long pno, String userEmail) {
         Product product = productRepository.findById(pno)

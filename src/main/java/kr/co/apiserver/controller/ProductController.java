@@ -147,4 +147,11 @@ public class ProductController {
         productService.changeStatusToActivated(pno);
         return ApiResponse.ok(null);
     }
+
+    // 상품 승인
+    @PatchMapping("/{pno}/approved")
+    public ApiResponse<Void> changeStatusToApproved(@PathVariable Long pno) {
+        productService.changeStatusToApproved(pno);
+        return ApiResponse.ok(null);
+    }
 }

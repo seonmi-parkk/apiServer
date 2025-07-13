@@ -21,4 +21,5 @@ public interface ProductService {
 
     void changeStatusToActivated(Long pno);
 
+    void changeStatusToApproved(Long pno);
 }

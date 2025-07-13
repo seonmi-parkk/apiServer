@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @ToString(exclude = "userRoleList")
-public class User {
+public class User extends TimeBaseEntity {
     @Id
     private String email;
 

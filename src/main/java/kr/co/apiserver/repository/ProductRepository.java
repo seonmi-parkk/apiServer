@@ -2,6 +2,7 @@ package kr.co.apiserver.repository;
 
 import kr.co.apiserver.domain.Product;
 import kr.co.apiserver.domain.emums.ProductStatus;
+import kr.co.apiserver.dto.AdminProductResponseDto;
 import kr.co.apiserver.dto.OrderPreviewResponseDto;
 import kr.co.apiserver.repository.search.ProductSearch;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -32,5 +33,13 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
             "where p.pno in :pnos")
     Optional<List<OrderPreviewResponseDto>> getOrderPrivewInfo(@Param("pnos") List<Long> productsNos);
 
-    List<Product> findByStatus(ProductStatus status);
+    @Query("select " +
+            "new kr.co.apiserver.dto.AdminProductResponseDto(p.pno, p.pname, p.price, p.createdAt, s.nickname, i.fileName) " +
+            "from Product p " +
+            "join p.seller s " +
+            "left join p.imageList i " +
+            "where p.status = :status " +
+            "and i.ord = 0 " +
+            "order by p.pno desc")
+    List<AdminProductResponseDto> findByStatus(ProductStatus status);
 }

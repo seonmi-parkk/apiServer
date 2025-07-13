@@ -1,8 +1,9 @@
 package kr.co.apiserver.service;
 
-import kr.co.apiserver.dto.AdminProductListResponseDto;
-import kr.co.apiserver.response.ApiResponse;
+import kr.co.apiserver.dto.AdminProductResponseDto;
+
+import java.util.List;
 
 public interface AdminService {
-    ApiResponse<AdminProductListResponseDto> getProductApprovalRequestList();
+    List<AdminProductResponseDto> getProductApprovalRequestList();
 }
