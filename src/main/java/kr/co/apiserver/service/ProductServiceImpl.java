@@ -161,6 +161,7 @@ public class ProductServiceImpl implements ProductService {
         product.changeStatus(ProductStatus.APPROVED);
     }
 
+    @Transactional
     @Override
     public void changeStatusToApproved(Long pno) {
         Product product = productRepository.findById(pno)
@@ -171,6 +172,19 @@ public class ProductServiceImpl implements ProductService {
             throw new CustomException(ErrorCode.BAD_REQUEST);
         }
         product.changeStatus(ProductStatus.APPROVED);
+    }
+
+    @Transactional
+    @Override
+    public void changeStatusToRejected(Long pno) {
+        Product product = productRepository.findById(pno)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        // 승인 대기 상태인 상품만 반려 가능
+        if (!product.getStatus().equals(ProductStatus.PENDING)) {
+            throw new CustomException(ErrorCode.BAD_REQUEST);
+        }
+        product.changeStatus(ProductStatus.REJECTED);
     }
 
     // 상품 수정 전 검증
