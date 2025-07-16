@@ -15,6 +15,7 @@ import kr.co.apiserver.util.CustomFileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,9 +39,7 @@ public class ProductServiceImpl implements ProductService {
         Page<ProductListResponseDto> dtoList  = productRepository.searchList(pageRequestDto, pageRequestDto.toPageable());
 
         return new PageResponseDto<>(dtoList);
-//
-//
-//
+
     }
 
     @Transactional
@@ -229,6 +228,34 @@ public class ProductServiceImpl implements ProductService {
     private Product getProduct(Long pno) {
         return productRepository.findById(pno)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+    }
+
+    @Transactional
+    public void safeIncreaseSales(Long pno) {
+        int retryCount = 0;
+        while (true) {
+            try {
+                increaseSales(pno);
+                break;
+            } catch (ObjectOptimisticLockingFailureException e) {
+                if (++retryCount > 3) {
+                    log.warn("판매량 증가 실패");
+                }
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+    }
+
+    @Transactional
+    public void increaseSales(Long pno) {
+        Product product = productRepository.findById(pno)
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+
+        product.increaseSalesCount();
     }
 
 }

@@ -10,6 +10,7 @@ import kr.co.apiserver.repository.OrderRepository;
 import kr.co.apiserver.response.exception.CustomException;
 import kr.co.apiserver.response.exception.ErrorCode;
 import kr.co.apiserver.service.IdempotencyService;
+import kr.co.apiserver.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final PaymentStrategyResolver strategyResolver;
     private final IdempotencyService idempotencyService;
+    private final ProductService productService;
 
     @Value("${frontend.base-url}")
     private String frontendBaseUrl;
@@ -72,6 +74,12 @@ public class PaymentServiceImpl implements PaymentService {
 
             order.setStatus(OrderStatus.PAID);
             order.setPaidAt(LocalDateTime.now());
+
+            // 상품 판매수 증가
+            order.getItems().forEach(item -> {
+                Long pno = item.getProduct().getPno();
+                productService.safeIncreaseSales(pno);
+            });
 
             // Redis에 결과 캐싱(Used로 변경)
             idempotencyService.markAsUsed(

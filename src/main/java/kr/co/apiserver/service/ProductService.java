@@ -24,4 +24,7 @@ public interface ProductService {
     void changeStatusToApproved(Long pno);
 
     void changeStatusToRejected(Long pno);
+
+    void safeIncreaseSales(Long pno);
+
 }

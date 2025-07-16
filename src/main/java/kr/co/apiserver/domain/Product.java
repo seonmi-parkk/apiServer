@@ -52,6 +52,11 @@ public class Product extends TimeBaseEntity {
     @Builder.Default
     private List<ProductImage> imageList = new ArrayList<>();
 
+    private int salesCount;
+
+    @Version
+    private Long version = 0L;
+
     public static Product createProduct(ProductDto productDto) {
         Product product = Product.builder()
                 .pno(productDto.getPno())
@@ -89,6 +94,8 @@ public class Product extends TimeBaseEntity {
     public void changeStatus(ProductStatus status) {
         this.status = status;
     }
+
+    public void increaseSalesCount() {this.salesCount++;}
 
     public void addImage(ProductImage image) {
         image.setProduct(this);

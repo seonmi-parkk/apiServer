@@ -1,9 +1,11 @@
 package kr.co.apiserver.repository.search;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.apiserver.domain.emums.ProductStatus;
+import kr.co.apiserver.domain.emums.SearchType;
 import kr.co.apiserver.dto.ProductListResponseDto;
 import kr.co.apiserver.util.QueryDslUtil;
 import kr.co.apiserver.domain.Product;
@@ -36,9 +38,44 @@ public class ProductSearchImpl implements ProductSearch {
         // 판매중인 상품만
         builder.and(product.status.eq(ProductStatus.APPROVED));
 
+        // 키워드 검색
+        if (pageRequestDto.getKeyword() != null && !pageRequestDto.getKeyword().isBlank()) {
+            String keyword = pageRequestDto.getKeyword();
+            SearchType type = pageRequestDto.getType();
+
+            if (type != null) {
+                switch (type) {
+                    case TITLE -> builder.and(product.pname.containsIgnoreCase(keyword));
+                    case CONTENT -> builder.and(product.pdesc.containsIgnoreCase(keyword));
+                    case TITLE_CONTENT -> builder.and(
+                            product.pname.containsIgnoreCase(keyword)
+                                    .or(product.pdesc.containsIgnoreCase(keyword))
+                    );
+                }
+            }
+        }
+
+        // 가격 조건
+        if (pageRequestDto.getMinPrice() != null) {
+            builder.and(product.price.goe(pageRequestDto.getMinPrice()));
+        }
+        if (pageRequestDto.getMaxPrice() != null) {
+            builder.and(product.price.loe(pageRequestDto.getMaxPrice()));
+        }
+
         // 카테고리 필터링
         if (pageRequestDto.getCategories() != null && !pageRequestDto.getCategories().isEmpty()) {
             builder.and(product.productCategories.any().category.cgno.in(pageRequestDto.getCategories()));
+        }
+
+        // 정렬 조건
+        OrderSpecifier<?> orderSpecifier;
+        switch (pageRequestDto.getSortBy()) {
+            case SALES -> orderSpecifier = product.salesCount.desc();
+            case PRICE_ASC -> orderSpecifier = product.price.asc();
+            case PRICE_DESC -> orderSpecifier = product.price.desc();
+            case LATEST -> orderSpecifier = product.pno.desc();
+            default -> orderSpecifier = product.pno.desc();
         }
 
         // 상품 ID List 조회
@@ -46,10 +83,15 @@ public class ProductSearchImpl implements ProductSearch {
                 .select(product.pno)
                 .from(product)
                 .where(builder)
-                .orderBy(QueryDslUtil.toOrderSpecifier(pageable.getSort(), product))
+                .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
+
+        // 조회된 상품 ID가 없으면 빈 페이지 반환
+        if (pnoList.isEmpty()) {
+            return PageableExecutionUtils.getPage(List.of(), pageable, () -> 0L);
+        }
 
         // 상품 ID로 상품 정보 조회, 이미지 fetch Join
         List<Product> result = queryFactory
@@ -57,7 +99,7 @@ public class ProductSearchImpl implements ProductSearch {
                 .leftJoin(product.seller, user).fetchJoin()
                 .leftJoin(product.imageList, productImage).fetchJoin()
                 .where(product.pno.in(pnoList))
-                .orderBy(QueryDslUtil.toOrderSpecifier(pageable.getSort(), product))
+                .orderBy(orderSpecifier)
                 .fetch();
 
         // DTO 변환
